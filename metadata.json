@@ -1,0 +1,7 @@
+{
+  "name": "myCORE",
+  "description": "A routine-centered habit system with an Apple-style clean aesthetic. Unlocking Limitless Potential.",
+  "requestFramePermissions": [
+    "geolocation"
+  ]
+}
