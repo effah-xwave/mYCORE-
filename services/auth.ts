@@ -1,71 +1,53 @@
-import { supabase } from './supabaseClient';
+import { User } from '../types';
 
-const SESSION_KEY = 'mycore_auth_session';
+// Mock Session for demo purposes
+const SESSION_KEY = 'mycore_session';
 
 export const AuthService = {
-  // Check if user is currently logged in via Supabase session
-  getCurrentUser: (): { email: string; uid: string } | null => {
-    // We check local storage for a quick sync, but Supabase manages its own session
-    const stored = localStorage.getItem(SESSION_KEY);
-    return stored ? JSON.parse(stored) : null;
+  getSession: async () => {
+    const session = localStorage.getItem(SESSION_KEY);
+    return session ? JSON.parse(session) : null;
   },
 
-  // Initialize - Check active session from Supabase
-  checkSession: async (): Promise<{ email: string; uid: string } | null> => {
-    const { data } = await supabase.auth.getSession();
-    if (data.session?.user) {
-      const user = { 
-        email: data.session.user.email || '', 
-        uid: data.session.user.id 
-      };
-      localStorage.setItem(SESSION_KEY, JSON.stringify(user));
-      return user;
-    }
-    return null;
-  },
-
-  login: async (email: string, password: string): Promise<{ email: string; uid: string }> => {
-    const { data, error } = await supabase.auth.signInWithPassword({
-      email,
-      password,
+  login: async (email: string, password: string) => {
+    // Simulate API call
+    return new Promise<{ user: any }>((resolve, reject) => {
+      setTimeout(() => {
+        if (email.includes('@')) {
+          const user = { email, id: 'user_123', user_metadata: { name: email.split('@')[0] } };
+          localStorage.setItem(SESSION_KEY, JSON.stringify({ user }));
+          resolve({ user });
+        } else {
+          reject(new Error("Invalid email"));
+        }
+      }, 1000);
     });
-
-    if (error) throw error;
-    if (!data.user) throw new Error("No user returned");
-
-    const user = { email: data.user.email || '', uid: data.user.id };
-    localStorage.setItem(SESSION_KEY, JSON.stringify(user));
-    return user;
   },
 
-  signup: async (email: string, password: string): Promise<{ email: string; uid: string }> => {
-    const { data, error } = await supabase.auth.signUp({
-      email,
-      password,
+  signup: async (email: string, password: string) => {
+    // Simulate API call
+    return new Promise<{ user: any }>((resolve) => {
+      setTimeout(() => {
+        const user = { email, id: 'user_123', user_metadata: { name: email.split('@')[0] } };
+        localStorage.setItem(SESSION_KEY, JSON.stringify({ user }));
+        resolve({ user });
+      }, 1000);
     });
-
-    if (error) throw error;
-    if (!data.user) throw new Error("No user returned");
-
-    const user = { email: data.user.email || '', uid: data.user.id };
-    localStorage.setItem(SESSION_KEY, JSON.stringify(user));
-    return user;
   },
 
-  loginWithGoogle: async (): Promise<{ email: string; uid: string }> => {
-    // Supabase Google Auth requires redirect handling usually
-    const { data, error } = await supabase.auth.signInWithOAuth({
-      provider: 'google',
-    });
-    if (error) throw error;
-    
-    // This part often involves a redirect, so the return might not be immediate in SPA
-    // For MVP structure we assume success flow
-    return { email: '', uid: '' }; 
+  loginWithGoogle: async () => {
+     return new Promise<{ user: any; email: string }>((resolve) => {
+        setTimeout(() => {
+            const email = "demo@growthnexis.global";
+            const user = { email, id: 'user_google_123', user_metadata: { name: "Demo User" } };
+            localStorage.setItem(SESSION_KEY, JSON.stringify({ user }));
+            resolve({ user, email });
+        }, 1500);
+     });
   },
 
   logout: async () => {
-    await supabase.auth.signOut();
     localStorage.removeItem(SESSION_KEY);
+    return Promise.resolve();
   }
 };
