@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { useApp } from '../App';
 import { getWeekDays, formatDate, getDayName, calculateCompletion } from '../utils';
@@ -108,26 +109,32 @@ const HabitRow = ({ habit, instance, onTrigger }: any) => {
         }
       `}
     >
-      <div className="flex items-center gap-4">
+      <div className="flex items-center gap-4 flex-1 min-w-0">
         <div className={`
-          w-12 h-12 rounded-[1rem] flex items-center justify-center transition-all duration-500
+          w-12 h-12 rounded-[1rem] flex items-center justify-center shrink-0 transition-all duration-500
           ${isCompleted 
-            ? 'bg-green-400 text-white scale-90 rotate-[-4deg] shadow-inner' 
+            ? 'bg-green-400 text-white scale-105 rotate-[-3deg] shadow-inner animate-scale-in' 
             : 'bg-ios-input text-navy-900 group-hover:bg-navy-900 group-hover:text-white'
           }
         `}>
           <IconComponent size={20} strokeWidth={isCompleted ? 3 : 2} />
         </div>
         
-        <div className="flex-1">
-          <h4 className={`text-[15px] font-semibold tracking-tight transition-colors ${isCompleted ? 'text-slate-400 line-through' : 'text-navy-900'}`}>
+        <div className="flex-1 min-w-0">
+          <h4 className={`text-[15px] font-semibold tracking-tight transition-colors truncate ${isCompleted ? 'text-slate-400 line-through' : 'text-navy-900'}`}>
             {habit.name}
           </h4>
-          <div className="flex items-center gap-2 mt-0.5">
-            <span className={`text-[10px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded text-slate-400 bg-slate-100`}>
+          <div className="flex items-center gap-2 mt-0.5 overflow-hidden">
+            <span className={`text-[10px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded text-slate-400 bg-slate-100 shrink-0`}>
               {habit.triggerType === TriggerType.MANUAL ? 'Manual' : 'Auto'}
             </span>
-            <span className="text-xs text-slate-400 font-medium">{getTriggerText()}</span>
+            
+            <span className={`flex items-center gap-1 text-[10px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded shrink-0 ${habit.streak > 0 ? 'text-orange-500 bg-orange-50' : 'text-slate-300 bg-slate-50'}`}>
+                <Icons.Flame size={10} fill={habit.streak > 0 ? "currentColor" : "none"} /> 
+                {habit.streak} Day{habit.streak !== 1 ? 's' : ''}
+            </span>
+
+            <span className="text-xs text-slate-400 font-medium truncate">{getTriggerText()}</span>
           </div>
         </div>
       </div>
@@ -136,14 +143,14 @@ const HabitRow = ({ habit, instance, onTrigger }: any) => {
         onClick={() => onTrigger(instance)}
         disabled={isCompleted}
         className={`
-          relative w-10 h-10 rounded-full flex items-center justify-center transition-all duration-300 active:scale-90
+          relative w-10 h-10 rounded-full flex items-center justify-center transition-all duration-300 active:scale-90 shrink-0 ml-2
           ${isCompleted 
-            ? 'bg-transparent text-green-500' 
+            ? 'bg-transparent text-green-500 scale-110' 
             : 'bg-ios-input text-slate-400 hover:bg-navy-900 hover:text-white hover:shadow-md'
           }
         `}
       >
-        {isCompleted ? <Icons.CheckCircle2 size={24} fill="currentColor" className="text-white" stroke="rgb(34, 197, 94)" /> : <div className="w-5 h-5 rounded-full border-[2.5px] border-current opacity-60" />}
+        {isCompleted ? <Icons.CheckCircle2 size={24} fill="currentColor" className="text-white animate-scale-in" stroke="rgb(34, 197, 94)" /> : <div className="w-5 h-5 rounded-full border-[2.5px] border-current opacity-60" />}
       </button>
     </div>
   );

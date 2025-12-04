@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Habit, TriggerType } from '../types';
 import { MapPin, Smartphone, Zap, CheckCircle2, Loader2, TrendingUp, Search } from 'lucide-react';
@@ -10,7 +9,7 @@ interface Props {
 }
 
 export default function HabitTriggerModal({ habit, onClose, onConfirm }: Props) {
-  const [step, setStep] = useState('simulate'); // simulate -> screen_time_success -> verifying -> success
+  const [step, setStep] = useState('simulate'); // simulate -> screen_time_success | location_success -> verifying -> success
   const [inputValue, setInputValue] = useState('');
   const [stockSim, setStockSim] = useState({ price: 0, change: 0, loading: false, done: false });
 
@@ -18,11 +17,15 @@ export default function HabitTriggerModal({ habit, onClose, onConfirm }: Props) 
   useEffect(() => {
     if (step === 'verifying') {
         const timer = setTimeout(() => {
-            onConfirm(inputValue ? parseInt(inputValue) : undefined);
+            if (habit.triggerType === TriggerType.LOCATION) {
+                setStep('location_success');
+            } else {
+                onConfirm(inputValue ? parseInt(inputValue) : undefined);
+            }
         }, 1500);
         return () => clearTimeout(timer);
     }
-  }, [step, onConfirm, inputValue]);
+  }, [step, onConfirm, inputValue, habit.triggerType]);
 
   const handleAction = () => {
     setStep('verifying');
@@ -68,10 +71,30 @@ export default function HabitTriggerModal({ habit, onClose, onConfirm }: Props) 
                     "Discipline is choosing between what you want now and what you want most."
                 </div>
                 <button 
-                    onClick={handleAction} 
+                    onClick={() => onConfirm(parseInt(inputValue))} 
                     className="w-full bg-navy-900 text-white py-3 rounded-xl font-medium mt-2 shadow-lg hover:shadow-xl hover:-translate-y-0.5 transition-all"
                 >
                     Confirm & Log Habit
+                </button>
+            </div>
+        );
+    }
+
+    if (step === 'location_success') {
+        return (
+            <div className="text-center space-y-4 animate-fade-in">
+                <div className="w-16 h-16 bg-green-50 rounded-full flex items-center justify-center mx-auto text-green-600">
+                    <CheckCircle2 size={32} />
+                </div>
+                <h3 className="font-bold text-xl text-navy-900">You're Here!</h3>
+                <p className="text-slate-500">
+                    Location verified at <br/> <span className="font-bold text-navy-900">{habit.triggerConfig?.locationName}</span>
+                </p>
+                <button 
+                    onClick={() => onConfirm()} 
+                    className="w-full bg-navy-900 text-white py-3 rounded-xl font-medium mt-2 shadow-lg hover:shadow-xl hover:-translate-y-0.5 transition-all"
+                >
+                    Check In & Complete
                 </button>
             </div>
         );
@@ -89,7 +112,7 @@ export default function HabitTriggerModal({ habit, onClose, onConfirm }: Props) 
                         Pretend you just walked into the geofence for: <br/>
                         <span className="font-semibold text-navy-900">{habit.triggerConfig?.locationName}</span>
                     </p>
-                    <button onClick={handleAction} className="w-full bg-navy-900 text-white py-3 rounded-xl font-medium mt-4">
+                    <button onClick={handleAction} className="w-full bg-navy-900 text-white py-3 rounded-xl font-medium mt-4 hover:bg-navy-800 transition-colors">
                         Arrive at Location
                     </button>
                 </div>

@@ -5,7 +5,8 @@ import { useApp } from '../App';
 import { 
   Play, FileText, ArrowUpRight, Star, 
   TrendingUp, Activity, CheckCircle2, Lock, 
-  BookOpen, Zap, Award, ExternalLink
+  BookOpen, Zap, Award, ExternalLink,
+  Sparkles, Heart
 } from 'lucide-react';
 
 // Mock Content Database
@@ -31,6 +32,16 @@ const BASE_CONTENT: Record<string, { id: string; title: string; type: 'video' | 
     { id: 'c10', title: "Phone-free Walk", type: "micro", duration: "20 min", completed: true },
   ]
 };
+
+const HEALTH_TIPS = [
+  { title: "Hydration Jumpstart", text: "Drink a large glass of water immediately after waking up to rehydrate your brain and body." },
+  { title: "The 20-20-20 Rule", text: "Every 20 minutes, look at something 20 feet away for 20 seconds to reduce eye strain." },
+  { title: "Walking Meetings", text: "Take your next phone call while walking. Movement boosts creativity and alertness." },
+  { title: "Eat the Rainbow", text: "Aim for 3 different colors of vegetables on your plate to ensure diverse micronutrient intake." },
+  { title: "Digital Sunset", text: "Turn off screens 60 minutes before bed to improve melatonin production and sleep quality." },
+  { title: "Box Breathing", text: "Inhale for 4s, hold for 4s, exhale for 4s, hold for 4s. Instantly reduces stress." },
+  { title: "Morning Sunlight", text: "Get 10 minutes of direct sunlight within an hour of waking to set your circadian rhythm." },
+];
 
 // Helper to generate content for custom interests
 const getGeneratedContent = (interest: string) => [
@@ -68,6 +79,10 @@ export default function Interests() {
   // Leveling Logic: Level 1 = 0-6 days total streak, Level 2 = 7+...
   const level = Math.max(1, Math.floor(totalStreak / 7) + 1);
   const progressToNextLevel = ((totalStreak % 7) / 7) * 100;
+
+  // Daily Tip Logic
+  const dayOfYear = Math.floor((new Date().getTime() - new Date(new Date().getFullYear(), 0, 0).getTime()) / 1000 / 60 / 60 / 24);
+  const dailyHealthTip = HEALTH_TIPS[dayOfYear % HEALTH_TIPS.length];
 
   const toggleContentComplete = (id: string) => {
     // Note: In a real app, this would persist to DB
@@ -226,6 +241,28 @@ export default function Interests() {
 
         {/* 4. ACTIVE HABITS SIDEBAR (RIGHT COL) */}
         <div className="space-y-6">
+            
+            {/* Daily Health Tip Widget */}
+            {activeTab === InterestType.HEALTH && (
+                <div className="bg-green-50 border border-green-100 p-6 rounded-[2rem] relative overflow-hidden shadow-sm transition-all hover:shadow-md">
+                    <div className="absolute top-0 right-0 opacity-10 transform translate-x-1/4 -translate-y-1/4 text-green-700">
+                        <Heart size={120} fill="currentColor" />
+                    </div>
+                    <div className="relative z-10">
+                        <div className="flex items-center gap-2 mb-3 text-green-700">
+                            <div className="p-1.5 bg-green-200/50 rounded-full">
+                                <Sparkles size={14} />
+                            </div>
+                            <span className="text-[10px] font-bold uppercase tracking-wide">Daily Health Tip</span>
+                        </div>
+                        <h4 className="font-bold text-navy-900 text-lg mb-2">{dailyHealthTip.title}</h4>
+                        <p className="text-sm text-slate-600 leading-relaxed font-medium">
+                            {dailyHealthTip.text}
+                        </p>
+                    </div>
+                </div>
+            )}
+
             <h3 className="text-xl font-bold text-navy-900 flex items-center gap-2">
                 <Activity size={20} className="text-blue-500" /> Active Habits
             </h3>

@@ -99,6 +99,8 @@ export interface Task {
     type: ReminderType;
     customDate?: string; // ISO
   };
+  subtasks?: { id: string; title: string; completed: boolean }[];
+  attachments?: string[];
 }
 
 export interface Project {

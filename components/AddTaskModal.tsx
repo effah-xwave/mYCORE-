@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useApp } from '../App';
 import { Task, Priority, ReminderType } from '../types';
 import { formatDate } from '../utils';
-import { X, Bell } from 'lucide-react';
+import { X, Bell, ListCheck, Paperclip, Plus, Trash2 } from 'lucide-react';
 
 export default function AddTaskModal({ onClose }: { onClose: () => void }) {
   const { addTask, projects } = useApp();
@@ -14,6 +14,23 @@ export default function AddTaskModal({ onClose }: { onClose: () => void }) {
     category: 'General',
     reminder: { type: ReminderType.AT_DEADLINE }
   });
+
+  // Subtasks State
+  const [subtasks, setSubtasks] = useState<{ id: string; title: string; completed: boolean }[]>([]);
+  const [newSubtask, setNewSubtask] = useState('');
+
+  // Attachments State
+  const [attachment, setAttachment] = useState('');
+
+  const addSubtask = () => {
+    if (!newSubtask.trim()) return;
+    setSubtasks([...subtasks, { id: Date.now().toString() + Math.random(), title: newSubtask, completed: false }]);
+    setNewSubtask('');
+  };
+
+  const removeSubtask = (id: string) => {
+    setSubtasks(subtasks.filter(s => s.id !== id));
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -28,7 +45,9 @@ export default function AddTaskModal({ onClose }: { onClose: () => void }) {
       category: formData.category || 'General',
       projectId: formData.projectId,
       completed: false,
-      reminder: formData.reminder
+      reminder: formData.reminder,
+      subtasks: subtasks,
+      attachments: attachment ? [attachment] : []
     } as Task);
     onClose();
   };
@@ -100,6 +119,52 @@ export default function AddTaskModal({ onClose }: { onClose: () => void }) {
                   placeholder="e.g. Work"
                />
             </div>
+          </div>
+
+          {/* SUBTASKS SECTION */}
+          <div className="bg-slate-50 p-4 rounded-xl border border-slate-100">
+             <div className="flex items-center gap-2 mb-2">
+                <ListCheck size={14} className="text-navy-900" />
+                <label className="text-xs font-bold text-slate-400 uppercase">Subtasks</label>
+             </div>
+             
+             <div className="space-y-2 mb-3">
+                {subtasks.map(st => (
+                    <div key={st.id} className="flex items-center justify-between bg-white p-2 rounded-lg text-sm border border-slate-100 shadow-sm">
+                        <span className="truncate flex-1 mr-2">{st.title}</span>
+                        <button type="button" onClick={() => removeSubtask(st.id)} className="text-slate-400 hover:text-red-500 transition-colors">
+                            <Trash2 size={14}/>
+                        </button>
+                    </div>
+                ))}
+             </div>
+
+             <div className="flex gap-2">
+                 <input 
+                    className="flex-1 p-2 rounded-lg bg-white border border-slate-200 text-sm focus:border-navy-900 focus:outline-none placeholder:text-slate-300"
+                    placeholder="Add a subtask..."
+                    value={newSubtask}
+                    onChange={e => setNewSubtask(e.target.value)}
+                    onKeyDown={e => e.key === 'Enter' && (e.preventDefault(), addSubtask())}
+                 />
+                 <button type="button" onClick={addSubtask} className="p-2 bg-white border border-slate-200 rounded-lg hover:border-navy-900 hover:text-navy-900 text-slate-400 transition-colors">
+                     <Plus size={18} />
+                 </button>
+             </div>
+          </div>
+
+          {/* ATTACHMENTS SECTION */}
+          <div className="bg-slate-50 p-4 rounded-xl border border-slate-100">
+             <div className="flex items-center gap-2 mb-2">
+                <Paperclip size={14} className="text-navy-900" />
+                <label className="text-xs font-bold text-slate-400 uppercase">Attachment (URL)</label>
+             </div>
+             <input 
+                className="w-full p-2 rounded-lg bg-white border border-slate-200 text-sm focus:border-navy-900 focus:outline-none placeholder:text-slate-300"
+                placeholder="e.g., https://drive.google.com/file..."
+                value={attachment}
+                onChange={e => setAttachment(e.target.value)}
+             />
           </div>
 
           <div className="bg-slate-50 p-4 rounded-xl border border-slate-100">
