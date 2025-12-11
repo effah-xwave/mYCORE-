@@ -1,8 +1,9 @@
+
 import React, { useState } from 'react';
-import { useApp } from '../App.tsx';
-import { Task, Priority, ReminderType } from '../../types.ts';
-import { formatDate } from '../../utils.ts';
-import { X, Bell, ListChecks, Paperclip, Plus, Trash2 } from 'lucide-react';
+import { useApp } from '../App';
+import { Task, Priority, ReminderType } from '../types';
+import { formatDate } from '../utils';
+import { X, Bell, ListCheck, Paperclip, Plus, Trash2, Link } from 'lucide-react';
 
 export default function AddTaskModal({ onClose }: { onClose: () => void }) {
   const { addTask, projects } = useApp();
@@ -93,7 +94,7 @@ export default function AddTaskModal({ onClose }: { onClose: () => void }) {
                 value={formData.priority}
                 onChange={e => setFormData({...formData, priority: e.target.value as Priority})}
               >
-                {(Object.values(Priority) as Priority[]).map(p => <option key={p} value={p}>{p}</option>)}
+                {Object.values(Priority).map(p => <option key={p} value={p}>{p}</option>)}
               </select>
             </div>
           </div>
@@ -124,15 +125,15 @@ export default function AddTaskModal({ onClose }: { onClose: () => void }) {
           {/* SUBTASKS SECTION */}
           <div className="bg-slate-50 p-4 rounded-xl border border-slate-100">
              <div className="flex items-center gap-2 mb-2">
-                <ListChecks size={14} className="text-navy-900" />
+                <ListCheck size={14} className="text-navy-900" />
                 <label className="text-xs font-bold text-slate-400 uppercase">Subtasks</label>
              </div>
              
              <div className="space-y-2 mb-3">
                 {subtasks.map(st => (
-                    <div key={st.id} className="flex items-center justify-between bg-white p-2 rounded-lg text-sm border border-slate-100 shadow-sm">
-                        <span className="truncate flex-1 mr-2">{st.title}</span>
-                        <button type="button" onClick={() => removeSubtask(st.id)} className="text-slate-400 hover:text-red-500 transition-colors">
+                    <div key={st.id} className="flex items-center justify-between bg-white p-2 rounded-lg text-sm border border-slate-100 shadow-sm animate-fade-in">
+                        <span className="truncate flex-1 mr-2 text-slate-700">{st.title}</span>
+                        <button type="button" onClick={() => removeSubtask(st.id)} className="text-slate-300 hover:text-red-500 transition-colors">
                             <Trash2 size={14}/>
                         </button>
                     </div>
@@ -141,7 +142,7 @@ export default function AddTaskModal({ onClose }: { onClose: () => void }) {
 
              <div className="flex gap-2">
                  <input 
-                    className="flex-1 p-2 rounded-lg bg-white border border-slate-200 text-sm focus:border-navy-900 focus:outline-none placeholder:text-slate-300"
+                    className="flex-1 p-2 rounded-lg bg-white border border-slate-200 text-sm focus:border-navy-900 focus:outline-none placeholder:text-slate-300 transition-all"
                     placeholder="Add a subtask..."
                     value={newSubtask}
                     onChange={e => setNewSubtask(e.target.value)}
@@ -159,12 +160,15 @@ export default function AddTaskModal({ onClose }: { onClose: () => void }) {
                 <Paperclip size={14} className="text-navy-900" />
                 <label className="text-xs font-bold text-slate-400 uppercase">Attachment (URL)</label>
              </div>
-             <input 
-                className="w-full p-2 rounded-lg bg-white border border-slate-200 text-sm focus:border-navy-900 focus:outline-none placeholder:text-slate-300"
-                placeholder="e.g., https://drive.google.com/file..."
-                value={attachment}
-                onChange={e => setAttachment(e.target.value)}
-             />
+             <div className="flex items-center gap-2 bg-white rounded-lg border border-slate-200 px-3 py-2 focus-within:border-navy-900 transition-colors">
+                 <Link size={14} className="text-slate-300" />
+                 <input 
+                    className="w-full text-sm focus:outline-none placeholder:text-slate-300 text-navy-900"
+                    placeholder="e.g., https://drive.google.com/file..."
+                    value={attachment}
+                    onChange={e => setAttachment(e.target.value)}
+                 />
+             </div>
           </div>
 
           <div className="bg-slate-50 p-4 rounded-xl border border-slate-100">
@@ -186,7 +190,7 @@ export default function AddTaskModal({ onClose }: { onClose: () => void }) {
                     });
                 }}
              >
-                {(Object.values(ReminderType) as ReminderType[]).map(t => <option key={t} value={t}>{t}</option>)}
+                {Object.values(ReminderType).map(t => <option key={t} value={t}>{t}</option>)}
              </select>
 
              {formData.reminder?.type === ReminderType.CUSTOM && (

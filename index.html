@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="dark">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -11,10 +11,11 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <script>
       tailwind.config = {
+        darkMode: 'class',
         theme: {
           extend: {
             fontFamily: {
-              sans: ['-apple-system', 'BlinkMacSystemFont', 'Inter', 'ui-sans-serif', 'system-ui', 'sans-serif'],
+              sans: ['Inter', '-apple-system', 'BlinkMacSystemFont', 'system-ui', 'sans-serif'],
             },
             colors: {
               navy: {
@@ -22,6 +23,16 @@
                 100: '#d9e2ec',
                 800: '#102a43',
                 900: '#0a1929', // Deep Navy
+                950: '#050b14', // Almost Black
+              },
+              dark: {
+                bg: '#0B1121',       // Main background
+                card: '#151E32',     // Card background
+                cardHover: '#1B2640', // Card hover
+                border: '#2A3655',   // Borders
+                text: '#E2E8F0',     // Primary text
+                muted: '#94A3B8',    // Secondary text
+                accent: '#3B82F6',   // Primary Blue
               },
               ios: {
                 bg: '#F5F5F7',
@@ -38,13 +49,16 @@
               'soft': '0 4px 24px -1px rgba(0, 0, 0, 0.04)',
               'apple': '0 12px 40px -4px rgba(0, 0, 0, 0.08)',
               'glass': '0 8px 32px 0 rgba(31, 38, 135, 0.05)',
-              'glow': '0 0 20px rgba(16, 42, 67, 0.15)',
+              'glow': '0 0 20px rgba(59, 130, 246, 0.15)',
+              'glow-green': '0 0 20px rgba(52, 199, 89, 0.15)',
               'inner-light': 'inset 0 1px 2px 0 rgba(255, 255, 255, 0.4)',
+              'dark-soft': '0 4px 20px -2px rgba(0, 0, 0, 0.5)',
             },
             animation: {
               'fade-in': 'fadeIn 0.6s ease-out forwards',
               'fade-in-up': 'fadeInUp 0.6s ease-out forwards',
               'scale-in': 'scaleIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards',
+              'blob': 'blob 10s infinite',
             },
             keyframes: {
               fadeIn: {
@@ -58,6 +72,12 @@
               scaleIn: {
                 '0%': { opacity: '0', transform: 'scale(0.95)' },
                 '100%': { opacity: '1', transform: 'scale(1)' },
+              },
+              blob: {
+                '0%': { transform: 'translate(0px, 0px) scale(1)' },
+                '33%': { transform: 'translate(30px, -50px) scale(1.1)' },
+                '66%': { transform: 'translate(-20px, 20px) scale(0.9)' },
+                '100%': { transform: 'translate(0px, 0px) scale(1)' },
               }
             }
           }
@@ -66,11 +86,28 @@
     </script>
     <style>
       body {
-        background-color: #F5F5F7; /* Apple iOS background */
-        color: #1d1d1f; /* Apple text color */
+        /* Default to light mode variable, overridden by dark mode class */
+        background-color: #F5F5F7;
+        color: #1d1d1f;
         -webkit-font-smoothing: antialiased;
         -moz-osx-font-smoothing: grayscale;
+        overflow-x: hidden;
       }
+      
+      /* Dark Mode Global Overrides */
+      .dark body {
+        background-color: #0B1121;
+        color: #E2E8F0;
+      }
+
+      /* Animation Delays */
+      .animation-delay-2000 {
+        animation-delay: 2s;
+      }
+      .animation-delay-4000 {
+        animation-delay: 4s;
+      }
+
       /* Hide scrollbar for clean UI but keep functionality */
       .no-scrollbar::-webkit-scrollbar {
         display: none;
@@ -85,6 +122,10 @@
         background: rgba(255, 255, 255, 0.7);
         backdrop-filter: blur(20px);
         -webkit-backdrop-filter: blur(20px);
+      }
+      .dark .glass {
+        background: rgba(15, 23, 42, 0.6);
+        border: 1px solid rgba(255, 255, 255, 0.05);
       }
       
       /* Smooth tap highlight */
@@ -109,6 +150,6 @@
 </head>
   <body>
     <div id="root"></div>
-    <script type="module" src="/src/main.tsx"></script>
+    <script type="module" src="/index.tsx"></script>
   </body>
 </html>

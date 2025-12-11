@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { AuthService } from '../services/auth.ts';
+import { AuthService } from '../services/auth';
 import { Loader2, ArrowRight } from 'lucide-react';
 
 interface AuthProps {
@@ -26,7 +26,7 @@ export default function Auth({ onSuccess }: AuthProps) {
         res = await AuthService.signup(email, password);
       }
       const name = email.split('@')[0];
-      onSuccess(res.user?.email || email, name);
+      onSuccess(res.email, name);
     } catch (err: any) {
       setError(err.message || 'Authentication failed');
     } finally {
@@ -39,7 +39,7 @@ export default function Auth({ onSuccess }: AuthProps) {
     try {
       const res = await AuthService.loginWithGoogle();
       const name = "Demo User";
-      onSuccess(res.user.email, name);
+      onSuccess(res.email, name);
     } catch (err) {
       setError('Google Auth failed');
     } finally {
@@ -48,36 +48,39 @@ export default function Auth({ onSuccess }: AuthProps) {
   };
 
   return (
-    <div className="min-h-screen bg-[#F5F5F7] flex items-center justify-center p-6 relative overflow-hidden">
-      {/* Refined Ambient Background */}
-      <div className="absolute top-[-10%] left-[-10%] w-[600px] h-[600px] bg-blue-200/40 rounded-full blur-[120px] mix-blend-multiply" />
-      <div className="absolute bottom-[-10%] right-[-10%] w-[600px] h-[600px] bg-purple-200/40 rounded-full blur-[120px] mix-blend-multiply" />
-      <div className="absolute top-[40%] left-[50%] translate-x-[-50%] w-[400px] h-[400px] bg-white/60 rounded-full blur-[100px]" />
+    <div className="min-h-screen bg-[#F8F9FA] dark:bg-dark-bg flex items-center justify-center p-6 relative overflow-hidden isolate transition-colors duration-500">
+      {/* Refined Ambient Background with Animation */}
+      <div className="absolute inset-0 z-0">
+          <div className="absolute top-[-20%] left-[-20%] w-[70vw] h-[70vw] bg-blue-300/30 dark:bg-blue-900/20 rounded-full blur-[100px] mix-blend-multiply dark:mix-blend-screen animate-blob" />
+          <div className="absolute bottom-[-20%] right-[-20%] w-[70vw] h-[70vw] bg-indigo-300/30 dark:bg-indigo-900/20 rounded-full blur-[100px] mix-blend-multiply dark:mix-blend-screen animate-blob animation-delay-2000" />
+          <div className="absolute top-[40%] left-[50%] translate-x-[-50%] w-[50vw] h-[50vw] bg-purple-200/30 dark:bg-purple-900/20 rounded-full blur-[80px] animate-blob animation-delay-4000 mix-blend-multiply dark:mix-blend-screen" />
+          <div className="absolute inset-0 bg-white/40 dark:bg-black/20 backdrop-blur-3xl"></div>
+      </div>
 
-      <div className="w-full max-w-[400px] bg-white/70 backdrop-blur-2xl rounded-[2.5rem] shadow-glass border border-white/50 p-8 md:p-10 z-10 animate-scale-in">
+      <div className="w-full max-w-[400px] bg-white/70 dark:bg-dark-card/70 backdrop-blur-xl rounded-[2.5rem] shadow-apple border border-white/60 dark:border-white/10 p-8 md:p-10 z-10 animate-scale-in">
         <div className="text-center mb-8">
           <div className="flex justify-center mb-6">
             <div className="relative group">
-                <div className="absolute inset-0 bg-navy-900 rounded-[1.5rem] blur opacity-20 group-hover:opacity-30 transition-opacity" />
-                <div className="relative w-24 h-24 bg-white rounded-[1.5rem] flex items-center justify-center shadow-apple overflow-hidden">
+                <div className="absolute inset-0 bg-navy-900 dark:bg-blue-600 rounded-[1.5rem] blur opacity-20 group-hover:opacity-30 transition-opacity" />
+                <div className="relative w-24 h-24 bg-white dark:bg-dark-card rounded-[1.5rem] flex items-center justify-center shadow-apple overflow-hidden transition-transform duration-500 hover:scale-105 border border-white/50 dark:border-white/5">
                     <img 
                       src="/logo.png" 
                       alt="GNG" 
                       className="w-16 h-16 object-contain"
                       onError={(e) => { e.currentTarget.style.display = 'none'; e.currentTarget.nextElementSibling?.classList.remove('hidden'); }}
                     />
-                    <span className="hidden text-3xl font-bold text-navy-900 tracking-tighter">GN</span>
+                    <span className="hidden text-3xl font-bold text-navy-900 dark:text-white tracking-tighter">GN</span>
                 </div>
             </div>
           </div>
-          <h1 className="text-2xl font-bold text-navy-900 tracking-tight">Growth Nexis Global</h1>
-          <p className="text-slate-500 text-[15px] font-medium mt-2">
+          <h1 className="text-2xl font-bold text-navy-900 dark:text-white tracking-tight">Growth Nexis Global</h1>
+          <p className="text-slate-500 dark:text-slate-400 text-[15px] font-medium mt-2">
             {isLogin ? 'Sign in to access myCORE' : 'Design your limitless potential'}
           </p>
         </div>
 
         {error && (
-            <div className="mb-6 p-3 bg-red-50 text-red-500 text-xs font-semibold rounded-xl text-center border border-red-100">
+            <div className="mb-6 p-3 bg-red-50 dark:bg-red-900/20 text-red-500 dark:text-red-400 text-xs font-semibold rounded-xl text-center border border-red-100 dark:border-red-900/30 animate-fade-in">
                 {error}
             </div>
         )}
@@ -89,7 +92,7 @@ export default function Auth({ onSuccess }: AuthProps) {
               required
               value={email}
               onChange={e => setEmail(e.target.value)}
-              className="w-full h-12 bg-[#F2F2F7] border-none rounded-xl px-4 text-[15px] text-navy-900 placeholder:text-slate-400 focus:ring-0 focus:bg-white focus:shadow-sm transition-all"
+              className="w-full h-12 bg-[#F2F2F7]/80 dark:bg-dark-bg/50 hover:bg-[#F2F2F7] dark:hover:bg-dark-bg border-none rounded-xl px-4 text-[15px] text-navy-900 dark:text-white placeholder:text-slate-400 focus:ring-2 focus:ring-navy-900/10 dark:focus:ring-blue-500/30 focus:bg-white dark:focus:bg-dark-bg focus:shadow-sm transition-all outline-none"
               placeholder="Email address"
             />
           </div>
@@ -99,7 +102,7 @@ export default function Auth({ onSuccess }: AuthProps) {
               required
               value={password}
               onChange={e => setPassword(e.target.value)}
-              className="w-full h-12 bg-[#F2F2F7] border-none rounded-xl px-4 text-[15px] text-navy-900 placeholder:text-slate-400 focus:ring-0 focus:bg-white focus:shadow-sm transition-all"
+              className="w-full h-12 bg-[#F2F2F7]/80 dark:bg-dark-bg/50 hover:bg-[#F2F2F7] dark:hover:bg-dark-bg border-none rounded-xl px-4 text-[15px] text-navy-900 dark:text-white placeholder:text-slate-400 focus:ring-2 focus:ring-navy-900/10 dark:focus:ring-blue-500/30 focus:bg-white dark:focus:bg-dark-bg focus:shadow-sm transition-all outline-none"
               placeholder="Password"
             />
           </div>
@@ -107,7 +110,7 @@ export default function Auth({ onSuccess }: AuthProps) {
           <button 
             type="submit"
             disabled={loading}
-            className="w-full h-12 bg-navy-900 text-white rounded-xl font-semibold shadow-lg shadow-navy-900/20 hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center justify-center gap-2 text-[15px]"
+            className="w-full h-12 bg-navy-900 dark:bg-blue-600 text-white rounded-xl font-semibold shadow-lg shadow-navy-900/20 dark:shadow-blue-600/20 hover:scale-[1.02] active:scale-[0.98] hover:bg-navy-800 dark:hover:bg-blue-500 transition-all flex items-center justify-center gap-2 text-[15px]"
           >
             {loading ? <Loader2 size={20} className="animate-spin" /> : (
               <>
@@ -119,15 +122,15 @@ export default function Auth({ onSuccess }: AuthProps) {
         </form>
 
         <div className="my-8 flex items-center gap-4">
-            <div className="h-px bg-slate-200 flex-1" />
+            <div className="h-px bg-slate-200 dark:bg-slate-700 flex-1" />
             <span className="text-xs font-semibold text-slate-400 uppercase tracking-wide">Or</span>
-            <div className="h-px bg-slate-200 flex-1" />
+            <div className="h-px bg-slate-200 dark:bg-slate-700 flex-1" />
         </div>
 
         <button 
             onClick={handleGoogle}
             type="button"
-            className="w-full h-12 bg-white border border-slate-200 text-slate-700 rounded-xl font-semibold hover:bg-slate-50 active:scale-[0.98] transition-all flex items-center justify-center gap-3 text-[15px]"
+            className="w-full h-12 bg-white/80 dark:bg-dark-bg border border-slate-200/60 dark:border-dark-border text-slate-700 dark:text-slate-300 rounded-xl font-semibold hover:bg-white dark:hover:bg-dark-cardHover active:scale-[0.98] transition-all flex items-center justify-center gap-3 text-[15px] shadow-sm"
         >
             <svg className="w-5 h-5" viewBox="0 0 24 24">
                 <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
@@ -138,11 +141,11 @@ export default function Auth({ onSuccess }: AuthProps) {
             Continue with Google
         </button>
 
-        <p className="text-center mt-8 text-sm text-slate-500">
+        <p className="text-center mt-8 text-sm text-slate-500 dark:text-slate-400">
           {isLogin ? "Don't have an account? " : "Already have an account? "}
           <button 
             onClick={() => setIsLogin(!isLogin)}
-            className="text-navy-900 font-bold hover:underline"
+            className="text-navy-900 dark:text-white font-bold hover:underline decoration-2 underline-offset-4"
           >
             {isLogin ? 'Sign Up' : 'Log In'}
           </button>

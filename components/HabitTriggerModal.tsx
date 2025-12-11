@@ -1,16 +1,18 @@
+
 import React, { useState, useEffect } from 'react';
-import { Habit, TriggerType } from '../../types.ts';
-import { MapPin, Smartphone, Zap, CheckCircle2, Loader2, TrendingUp, Search } from 'lucide-react';
+import { Habit, TriggerType } from '../types';
+import { MapPin, Smartphone, Zap, CheckCircle2, Loader2, TrendingUp, Search, Target } from 'lucide-react';
 
 interface Props {
   habit: Habit;
   onClose: () => void;
   onConfirm: (val?: number) => void;
+  initialValue?: number;
 }
 
-export default function HabitTriggerModal({ habit, onClose, onConfirm }: Props) {
-  const [step, setStep] = useState('simulate'); // simulate -> screen_time_success | location_success -> verifying -> success
-  const [inputValue, setInputValue] = useState('');
+export default function HabitTriggerModal({ habit, onClose, onConfirm, initialValue }: Props) {
+  const [step, setStep] = useState(habit.goal ? 'log_progress' : 'simulate'); // log_progress -> simulate -> screen_time_success | location_success -> verifying -> success
+  const [inputValue, setInputValue] = useState(initialValue !== undefined ? String(initialValue) : '');
   const [stockSim, setStockSim] = useState({ price: 0, change: 0, loading: false, done: false });
 
   // Auto transition for Location/App Open simulation
@@ -20,7 +22,7 @@ export default function HabitTriggerModal({ habit, onClose, onConfirm }: Props) 
             if (habit.triggerType === TriggerType.LOCATION) {
                 setStep('location_success');
             } else {
-                onConfirm(inputValue ? parseInt(inputValue) : undefined);
+                onConfirm(inputValue ? parseFloat(inputValue) : undefined);
             }
         }, 1500);
         return () => clearTimeout(timer);
@@ -47,6 +49,44 @@ export default function HabitTriggerModal({ habit, onClose, onConfirm }: Props) 
   };
 
   const renderContent = () => {
+    // 1. MANUAL GOAL LOGGING
+    if (step === 'log_progress' && habit.goal) {
+        return (
+            <div className="text-center space-y-4">
+                 <div className="w-16 h-16 bg-blue-50 rounded-full flex items-center justify-center mx-auto text-blue-600">
+                    <Target size={32} />
+                </div>
+                <h3 className="font-bold text-xl">Log Progress</h3>
+                <p className="text-slate-500">
+                    Goal: <span className="font-bold text-navy-900">{habit.goal.target} {habit.goal.unit}</span>
+                </p>
+                <div className="bg-slate-50 p-4 rounded-xl border border-slate-200">
+                    <label className="text-xs text-slate-400 block mb-1 text-left">Today's Total ({habit.goal.unit}):</label>
+                    <input 
+                        type="number" 
+                        value={inputValue} 
+                        onChange={(e) => setInputValue(e.target.value)}
+                        className="w-full bg-white border border-slate-300 rounded-lg px-3 py-2 text-lg font-bold text-center outline-none focus:border-navy-900 transition-colors"
+                        placeholder="0"
+                        autoFocus
+                    />
+                </div>
+                <button 
+                    onClick={() => {
+                        const val = parseFloat(inputValue);
+                        if (!isNaN(val)) {
+                            onConfirm(val);
+                        }
+                    }} 
+                    disabled={!inputValue}
+                    className="w-full bg-navy-900 disabled:bg-slate-300 text-white py-3 rounded-xl font-medium"
+                >
+                    Update Progress
+                </button>
+            </div>
+        );
+    }
+
     if (step === 'verifying') {
         return (
             <div className="flex flex-col items-center justify-center py-8 animate-pulse">

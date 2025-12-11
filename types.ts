@@ -37,7 +37,13 @@ export interface Habit {
     appName?: string;
     actionDetail?: string; // Specific action description (e.g., "Check S&P 500")
   };
+  // New Goal Configuration
+  goal?: {
+    target: number;
+    unit: string; // e.g. 'km', 'pages', 'min'
+  };
   streak: number;
+  isFavorite?: boolean;
 }
 
 export interface HabitInstance {
@@ -46,7 +52,7 @@ export interface HabitInstance {
   date: string; // YYYY-MM-DD
   completed: boolean;
   completedAt?: string;
-  value?: number; // e.g., minutes spent
+  value?: number; // Current progress value (e.g. 5)
 }
 
 export interface User {

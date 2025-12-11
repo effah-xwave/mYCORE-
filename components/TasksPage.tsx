@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
-import { useApp } from '../App.tsx';
-import { Task, Project, Priority } from '../../types.ts';
-import { formatDate } from '../../utils.ts';
+import { useApp } from '../App';
+import { Task, Project, Priority } from '../types';
+import { formatDate } from '../utils';
 import { 
   Plus, Calendar as CalendarIcon, List, Clock, Briefcase, 
-  Flag, ChevronLeft, ChevronRight, CheckCircle2, Trash2, CheckSquare, Bell
+  Flag, ChevronLeft, ChevronRight, CheckCircle2, Trash2, CheckSquare, Bell,
+  Filter, X, Tag, Layers
 } from 'lucide-react';
 import AddTaskModal from './AddTaskModal';
 import AddProjectModal from './AddProjectModal';
@@ -148,10 +149,45 @@ export default function TasksPage() {
   const [showTaskModal, setShowTaskModal] = useState(false);
   const [showProjectModal, setShowProjectModal] = useState(false);
 
-  // Filter Tasks
-  const filteredTasks = view === 'list' 
-    ? tasks.sort((a,b) => new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime())
-    : tasks.filter(t => t.dueDate === selectedDate);
+  // Filter State
+  const [showFilters, setShowFilters] = useState(false);
+  const [filterProject, setFilterProject] = useState<string>('all');
+  const [filterCategory, setFilterCategory] = useState<string>('all');
+  const [filterPriority, setFilterPriority] = useState<string>('all');
+
+  // Derive Data
+  const categories = Array.from(new Set(tasks.map(t => t.category).filter(Boolean))).sort();
+
+  // 1. Apply Global Filters (Proj, Cat, Prio)
+  const globalFilteredTasks = tasks.filter(task => {
+      // Project Filter
+      if (filterProject !== 'all') {
+          if (filterProject === 'unassigned') {
+              if (task.projectId) return false;
+          } else if (task.projectId !== filterProject) {
+              return false;
+          }
+      }
+      // Category Filter
+      if (filterCategory !== 'all' && task.category !== filterCategory) return false;
+      // Priority Filter
+      if (filterPriority !== 'all' && task.priority !== filterPriority) return false;
+      
+      return true;
+  });
+
+  // 2. Apply View Specific Logic (Date sorting or filtering)
+  const displayTasks = view === 'list' 
+    ? [...globalFilteredTasks].sort((a,b) => new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime())
+    : globalFilteredTasks.filter(t => t.dueDate === selectedDate);
+
+  const activeFiltersCount = (filterProject !== 'all' ? 1 : 0) + (filterCategory !== 'all' ? 1 : 0) + (filterPriority !== 'all' ? 1 : 0);
+
+  const clearFilters = () => {
+      setFilterProject('all');
+      setFilterCategory('all');
+      setFilterPriority('all');
+  };
   
   return (
     <div className="space-y-8 pb-10">
@@ -197,7 +233,7 @@ export default function TasksPage() {
          {view === 'calendar' && (
             <div className="animate-fade-in-up">
               <CalendarView 
-                tasks={tasks} 
+                tasks={globalFilteredTasks} 
                 onDateSelect={setSelectedDate} 
                 selectedDate={selectedDate} 
               />
@@ -210,19 +246,88 @@ export default function TasksPage() {
                 <h3 className="text-2xl font-bold text-navy-900 tracking-tight">
                     {view === 'calendar' ? `${new Date(selectedDate).toLocaleDateString(undefined, {weekday: 'long'})}` : 'Tasks'}
                 </h3>
-                <p className="text-slate-500 font-medium text-sm mt-1">{filteredTasks.filter(t => !t.completed).length} pending</p>
+                <p className="text-slate-500 font-medium text-sm mt-1">{displayTasks.filter(t => !t.completed).length} pending</p>
               </div>
-              <button 
-                onClick={() => setShowTaskModal(true)}
-                className="w-12 h-12 bg-navy-900 text-white rounded-full flex items-center justify-center shadow-lg hover:scale-105 active:scale-90 transition-all"
-              >
-                <Plus size={24} />
-              </button>
+              
+              <div className="flex gap-2">
+                 <button 
+                    onClick={() => setShowFilters(!showFilters)} 
+                    className={`relative w-12 h-12 rounded-full flex items-center justify-center transition-all ${showFilters || activeFiltersCount > 0 ? 'bg-slate-100 text-navy-900' : 'bg-slate-50 text-slate-400 hover:bg-slate-100'}`}
+                 >
+                    <Filter size={20} />
+                    {activeFiltersCount > 0 && !showFilters && (
+                        <span className="absolute top-0 right-0 w-4 h-4 bg-blue-500 rounded-full text-[10px] text-white flex items-center justify-center border-2 border-white">
+                            {activeFiltersCount}
+                        </span>
+                    )}
+                 </button>
+                 <button 
+                    onClick={() => setShowTaskModal(true)}
+                    className="w-12 h-12 bg-navy-900 text-white rounded-full flex items-center justify-center shadow-lg hover:scale-105 active:scale-90 transition-all"
+                >
+                    <Plus size={24} />
+                </button>
+              </div>
             </div>
 
+            {/* FILTER PANEL */}
+            {showFilters && (
+                <div className="flex flex-wrap gap-3 mb-6 animate-fade-in p-4 bg-slate-50 rounded-2xl border border-slate-100">
+                    {/* Project */}
+                    <div className="relative">
+                        <select 
+                            value={filterProject} 
+                            onChange={(e) => setFilterProject(e.target.value)}
+                            className="appearance-none pl-9 pr-8 py-2 bg-white border border-slate-200 rounded-xl text-xs font-bold text-slate-600 focus:outline-none focus:border-navy-900 focus:ring-1 focus:ring-navy-900/10 cursor-pointer min-w-[140px]"
+                        >
+                            <option value="all">All Projects</option>
+                            <option value="unassigned">No Project</option>
+                            {projects.map(p => <option key={p.id} value={p.id}>{p.name}</option>)}
+                        </select>
+                        <Briefcase size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" />
+                    </div>
+
+                    {/* Category */}
+                    <div className="relative">
+                        <select 
+                            value={filterCategory} 
+                            onChange={(e) => setFilterCategory(e.target.value)}
+                            className="appearance-none pl-9 pr-8 py-2 bg-white border border-slate-200 rounded-xl text-xs font-bold text-slate-600 focus:outline-none focus:border-navy-900 focus:ring-1 focus:ring-navy-900/10 cursor-pointer min-w-[130px]"
+                        >
+                            <option value="all">All Categories</option>
+                            {categories.map(c => <option key={c} value={c}>{c}</option>)}
+                        </select>
+                        <Tag size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" />
+                    </div>
+
+                    {/* Priority */}
+                    <div className="relative">
+                        <select 
+                            value={filterPriority} 
+                            onChange={(e) => setFilterPriority(e.target.value)}
+                            className="appearance-none pl-9 pr-8 py-2 bg-white border border-slate-200 rounded-xl text-xs font-bold text-slate-600 focus:outline-none focus:border-navy-900 focus:ring-1 focus:ring-navy-900/10 cursor-pointer min-w-[120px]"
+                        >
+                            <option value="all">All Priorities</option>
+                            {Object.values(Priority).map(p => <option key={p} value={p}>{p}</option>)}
+                        </select>
+                        <Flag size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" />
+                    </div>
+
+                    {/* Clear */}
+                    {activeFiltersCount > 0 && (
+                        <button 
+                            onClick={clearFilters}
+                            className="flex items-center gap-1.5 px-3 py-2 bg-white border border-slate-200 hover:bg-red-50 hover:border-red-200 hover:text-red-500 rounded-xl text-xs font-bold text-slate-500 transition-all ml-auto"
+                        >
+                            <X size={14} /> Clear
+                        </button>
+                    )}
+                </div>
+            )}
+
             <div className="space-y-1 max-h-[600px] overflow-y-auto pr-2 -mr-2">
-               {filteredTasks.length > 0 ? (
-                  filteredTasks.map(task => (
+               {displayTasks.length > 0 ? (
+                  displayTasks.map(task => (
                     <TaskItem 
                         key={task.id} 
                         task={task} 
@@ -236,8 +341,11 @@ export default function TasksPage() {
                      <div className="w-20 h-20 bg-slate-50 rounded-full flex items-center justify-center mb-4">
                         <CheckSquare size={32} strokeWidth={1.5} />
                      </div>
-                     <p className="font-medium">No tasks found</p>
-                     {view === 'calendar' && <p className="text-sm mt-1">Tap + to add a task for this day</p>}
+                     <p className="font-medium">No tasks match your filters</p>
+                     {(view === 'calendar' && activeFiltersCount === 0) && <p className="text-sm mt-1">Tap + to add a task for this day</p>}
+                     {activeFiltersCount > 0 && (
+                        <button onClick={clearFilters} className="mt-4 text-xs font-bold text-navy-900 underline">Clear Filters</button>
+                     )}
                   </div>
                )}
             </div>

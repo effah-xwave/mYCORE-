@@ -1,5 +1,5 @@
-import { Habit, HabitInstance, InterestType, TriggerType, User, ScheduleType, Task, Project } from '../../types.ts';
-import { formatDate } from '../../utils.ts';
+import { Habit, HabitInstance, InterestType, TriggerType, User, ScheduleType, Task, Project } from '../types';
+import { formatDate } from '../utils';
 
 // --- MOCK DATABASE SERVICE ---
 // Simulates a backend with LocalStorage persistence
@@ -103,6 +103,17 @@ class MockDBService {
     }
 
     return habits;
+  }
+
+  async toggleHabitFavorite(habitId: string): Promise<void> {
+    const json = localStorage.getItem('mycore_habits');
+    if (!json) return;
+    const habits: Habit[] = JSON.parse(json);
+    const idx = habits.findIndex(h => h.id === habitId);
+    if (idx !== -1) {
+        habits[idx].isFavorite = !habits[idx].isFavorite;
+        localStorage.setItem('mycore_habits', JSON.stringify(habits));
+    }
   }
 
   private calculateHabitStrength(habit: Habit, instances: HabitInstance[]): void {

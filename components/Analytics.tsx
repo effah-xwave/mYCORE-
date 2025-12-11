@@ -1,7 +1,7 @@
 import React from 'react';
-import { useApp } from '../App.tsx';
-import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell } from 'recharts';
-import { getDayName } from '../../utils.ts';
+import { useApp } from '../App';
+import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell, LineChart, Line } from 'recharts';
+import { getDayName } from '../utils';
 
 export default function Analytics() {
   const { currentWeekInstances, habits } = useApp();
@@ -106,6 +106,41 @@ export default function Analytics() {
           </ResponsiveContainer>
         </div>
 
+      </div>
+
+      {/* COMPLETION TREND (LINE CHART) */}
+      <div className="bg-white p-6 rounded-3xl shadow-soft border border-slate-100 h-80">
+        <h3 className="text-sm font-bold text-slate-800 mb-6">Completion Trend</h3>
+        <ResponsiveContainer width="100%" height="100%">
+          <LineChart data={chartData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+             <XAxis 
+                dataKey="day" 
+                axisLine={false} 
+                tickLine={false} 
+                tick={{ fill: '#94a3b8', fontSize: 12 }} 
+                dy={10} 
+             />
+             <YAxis 
+                axisLine={false} 
+                tickLine={false} 
+                tick={{ fill: '#94a3b8', fontSize: 12 }} 
+                domain={[0, 100]} 
+             />
+             <Tooltip 
+                cursor={{ stroke: '#cbd5e1', strokeWidth: 1 }}
+                contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }}
+                formatter={(value: number) => [`${value}%`, 'Completion Rate']}
+             />
+             <Line 
+                type="monotone" 
+                dataKey="rate" 
+                stroke="#0f172a" 
+                strokeWidth={3} 
+                dot={{ r: 4, fill: '#0f172a', strokeWidth: 2, stroke: '#fff' }} 
+                activeDot={{ r: 6, fill: '#0f172a', strokeWidth: 0 }}
+             />
+          </LineChart>
+        </ResponsiveContainer>
       </div>
 
       {/* STRENGTH SCORES */}
