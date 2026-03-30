@@ -103,7 +103,7 @@ const DayCell = ({ date, isSelected, isToday, hasData, onClick }: any) => {
             `}
         >
             <span className="text-[10px] font-bold uppercase tracking-widest mb-2">{dayName}</span>
-            <span className={`text-xl md:text-2xl font-display font-bold ${isSelected ? 'text-white' : 'text-slate-700 dark:text-slate-200'}`}>{dayNum}</span>
+            <span className={`text-xl md:text-2xl font-display font-bold ${isSelected ? 'text-inherit' : 'text-slate-700 dark:text-slate-200'}`}>{dayNum}</span>
             {isToday && !isSelected && <div className="w-1.5 h-1.5 bg-blue-500 rounded-full mt-2" />}
             {hasData && !isSelected && !isToday && <div className="w-1 h-1 bg-slate-100 dark:bg-slate-700 rounded-full mt-2" />}
         </button>

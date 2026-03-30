@@ -10,7 +10,7 @@ import { NotificationService } from './services/notificationService';
 // Icons
 import { 
   LayoutDashboard, Compass, BarChart2, Settings, Loader2, CheckSquare, 
-  LogOut, Sun, Moon, Search, Bell, Menu, X, Briefcase, Navigation, Sparkles
+  LogOut, Sun, Moon, Search, Bell, Menu, X, Briefcase, Navigation, Sparkles, Zap
 } from 'lucide-react';
 
 // Components
@@ -24,6 +24,7 @@ import TasksPage from './components/TasksPage';
 import ProjectsPage from './components/ProjectsPage';
 import MapsAgent from './components/MapsAgent';
 import GrowthChatbot from './components/GrowthChatbot';
+import OptimizeRoutineModal from './components/OptimizeRoutineModal';
 import LoadingTransition from './components/LoadingTransition';
 
 // --- CONTEXT ---
@@ -359,8 +360,15 @@ export default function App() {
           <aside className="hidden md:flex flex-col w-20 lg:w-72 bg-white dark:bg-dark-card backdrop-blur-2xl border-r border-slate-200 dark:border-dark-border transition-all duration-300 z-50">
              <div className="h-20 flex items-center justify-center lg:justify-start lg:px-8 border-b border-slate-100 dark:border-dark-border/50">
                 <div className="relative group flex items-center gap-3">
-                  <div className="w-10 h-10 bg-slate-900 dark:bg-blue-600 rounded-xl flex items-center justify-center text-white font-bold text-sm shadow-glow transition-all group-hover:scale-110">
-                    GN
+                  <div className="w-10 h-10 bg-white dark:bg-dark-card rounded-xl flex items-center justify-center shadow-glow transition-all group-hover:scale-110 overflow-hidden border border-slate-200 dark:border-dark-border">
+                    <img 
+                      src="https://drive.google.com/thumbnail?id=1Cn2hUpBxHLJ_6QmG8JYxJ9mjAgpDJa5f&sz=w128" 
+                      alt="myCORE" 
+                      className="w-8 h-8 object-contain"
+                      referrerPolicy="no-referrer"
+                      onError={(e) => { e.currentTarget.style.display = 'none'; e.currentTarget.nextElementSibling?.classList.remove('hidden'); }}
+                    />
+                    <span className="hidden text-[10px] font-bold text-slate-900 dark:text-white">CORE</span>
                   </div>
                   <span className="hidden lg:block font-display font-bold text-2xl tracking-tight text-slate-900 dark:text-white">myCORE</span>
                 </div>
@@ -370,6 +378,7 @@ export default function App() {
                 {[
                   { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
                   { id: 'growth', label: 'Growth AI', icon: Sparkles },
+                  { id: 'optimize', label: 'Optimize', icon: Zap },
                   { id: 'projects', label: 'Projects', icon: Briefcase },
                   { id: 'tasks', label: 'Tasks', icon: CheckSquare },
                   { id: 'navigator', label: 'Navigator', icon: Navigation },
@@ -465,6 +474,7 @@ export default function App() {
                 <div className="max-w-7xl mx-auto animate-fade-in">
                   {activeTab === 'dashboard' && <Dashboard />}
                   {activeTab === 'growth' && <GrowthChatbot />}
+                  {activeTab === 'optimize' && <OptimizeRoutineModal isPage={true} />}
                   {activeTab === 'projects' && <ProjectsPage />}
                   {activeTab === 'tasks' && <TasksPage />}
                   {activeTab === 'navigator' && <MapsAgent />}
@@ -488,6 +498,7 @@ export default function App() {
                       {[
                         { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
                         { id: 'growth', label: 'Growth AI', icon: Sparkles },
+                        { id: 'optimize', label: 'Optimize', icon: Zap },
                         { id: 'projects', label: 'Projects', icon: Briefcase },
                         { id: 'tasks', label: 'Tasks', icon: CheckSquare },
                         { id: 'navigator', label: 'Navigator', icon: Navigation },

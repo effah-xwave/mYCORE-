@@ -3,7 +3,7 @@ import { useApp } from '../App';
 import { motion, AnimatePresence } from 'framer-motion';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell, LineChart, Line, AreaChart, Area } from 'recharts';
 import { getDayName, formatDate } from '../utils';
-import { TrendingUp, Activity, Calendar, BarChart2, PieChart } from 'lucide-react';
+import { TrendingUp, Activity, Calendar, BarChart2, PieChart, Target, Zap, Brain, Shield } from 'lucide-react';
 import { HabitInstance } from '../types';
 
 type ViewType = 'weekly' | 'monthly' | 'annually';
@@ -232,6 +232,71 @@ export default function Analytics() {
                 </AreaChart>
             </ResponsiveContainer>
           </div>
+        </div>
+
+      </div>
+
+      {/* HEATMAP & FOCUS BALANCE */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        
+        {/* HEATMAP */}
+        <div className="lg:col-span-2 bg-white dark:bg-dark-card backdrop-blur-xl p-8 rounded-[2.5rem] shadow-sm dark:shadow-dark-soft border border-slate-200 dark:border-dark-border">
+            <div className="flex items-center justify-between mb-8">
+                <h3 className="text-[11px] font-bold text-slate-500 uppercase tracking-[0.2em]">Activity Heatmap</h3>
+                <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Last 30 Days</span>
+            </div>
+            <div className="grid grid-cols-7 sm:grid-cols-10 md:grid-cols-15 gap-2">
+                {Array.from({ length: 30 }).map((_, i) => {
+                    const opacity = Math.random() * 0.8 + 0.1;
+                    return (
+                        <div 
+                            key={i} 
+                            className="aspect-square rounded-md bg-blue-500 transition-all hover:scale-125 cursor-pointer"
+                            style={{ opacity }}
+                            title={`Day ${i+1}: ${Math.round(opacity * 100)}% completion`}
+                        />
+                    )
+                })}
+            </div>
+            <div className="mt-8 flex items-center gap-4 text-[10px] font-bold text-slate-400 uppercase tracking-widest">
+                <span>Less</span>
+                <div className="flex gap-1">
+                    <div className="w-3 h-3 rounded-sm bg-blue-500 opacity-10" />
+                    <div className="w-3 h-3 rounded-sm bg-blue-500 opacity-30" />
+                    <div className="w-3 h-3 rounded-sm bg-blue-500 opacity-60" />
+                    <div className="w-3 h-3 rounded-sm bg-blue-500 opacity-90" />
+                </div>
+                <span>More</span>
+            </div>
+        </div>
+
+        {/* FOCUS BALANCE */}
+        <div className="bg-white dark:bg-dark-card backdrop-blur-xl p-8 rounded-[2.5rem] shadow-sm dark:shadow-dark-soft border border-slate-200 dark:border-dark-border">
+            <div className="flex items-center justify-between mb-8">
+                <h3 className="text-[11px] font-bold text-slate-500 uppercase tracking-[0.2em]">Focus Balance</h3>
+                <PieChart size={16} className="text-blue-500" />
+            </div>
+            <div className="space-y-6">
+                {[
+                    { label: 'Health', value: 75, color: 'bg-blue-500', icon: Activity },
+                    { label: 'Productivity', value: 45, color: 'bg-indigo-500', icon: Zap },
+                    { label: 'Learning', value: 60, color: 'bg-purple-500', icon: Brain },
+                    { label: 'Detox', value: 30, color: 'bg-amber-500', icon: Shield },
+                ].map((item) => (
+                    <div key={item.label} className="space-y-2">
+                        <div className="flex justify-between items-center">
+                            <div className="flex items-center gap-2">
+                                <item.icon size={14} className="text-slate-400" />
+                                <span className="text-xs font-bold text-slate-900 dark:text-white">{item.label}</span>
+                            </div>
+                            <span className="text-[10px] font-bold text-slate-400">{item.value}%</span>
+                        </div>
+                        <div className="h-1.5 w-full bg-slate-50 dark:bg-white/5 rounded-full overflow-hidden">
+                            <div className={`h-full ${item.color} rounded-full`} style={{ width: `${item.value}%` }} />
+                        </div>
+                    </div>
+                ))}
+            </div>
         </div>
 
       </div>

@@ -145,12 +145,13 @@ export default function Onboarding() {
              <div className="flex justify-center mb-4">
                 <div className="w-24 h-24 bg-white dark:bg-dark-card rounded-[2rem] shadow-apple border border-slate-100 dark:border-dark-border flex items-center justify-center p-4">
                     <img 
-                      src="/logo.png" 
-                      alt="GNG" 
+                      src="https://drive.google.com/thumbnail?id=1Cn2hUpBxHLJ_6QmG8JYxJ9mjAgpDJa5f&sz=w256" 
+                      alt="myCORE" 
                       className="w-full h-full object-contain"
+                      referrerPolicy="no-referrer"
                       onError={(e) => { e.currentTarget.style.display = 'none'; e.currentTarget.nextElementSibling?.classList.remove('hidden'); }}
                     />
-                     <span className="hidden text-3xl font-bold text-slate-900 dark:text-white">GN</span>
+                     <span className="hidden text-3xl font-bold text-slate-900 dark:text-white">CORE</span>
                 </div>
             </div>
             
@@ -198,33 +199,27 @@ export default function Onboarding() {
                   </button>
                 )
               })}
-              
-              {!isAddingInterest ? (
+            </div>
+
+            {/* Custom Interest Input */}
+            <div className="p-6 bg-slate-50 dark:bg-dark-bg/30 rounded-[2rem] border border-slate-100 dark:border-dark-border">
+               <label className="block text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-[0.2em] mb-3 px-1">Add Custom Interest</label>
+               <div className="flex gap-2">
+                  <input 
+                    value={newInterestName}
+                    onChange={(e) => setNewInterestName(e.target.value)}
+                    placeholder="e.g. Photography, Meditation..."
+                    className="flex-1 h-12 px-4 rounded-2xl bg-white dark:bg-dark-card border border-slate-200 dark:border-dark-border text-sm font-semibold outline-none focus:ring-2 focus:ring-blue-500 transition-all text-slate-900 dark:text-white"
+                    onKeyDown={(e) => e.key === 'Enter' && addNewInterest()}
+                  />
                   <button 
-                    onClick={() => setIsAddingInterest(true)}
-                    className="p-5 rounded-3xl border-2 border-dashed border-slate-300 dark:border-dark-border text-slate-400 hover:border-slate-900 dark:hover:border-blue-500 hover:text-slate-900 dark:hover:text-white transition-all flex flex-col items-center justify-center gap-3 group"
+                    onClick={addNewInterest}
+                    disabled={!newInterestName.trim()}
+                    className="h-12 px-5 bg-slate-900 dark:bg-blue-600 text-white rounded-2xl font-bold text-sm shadow-lg disabled:opacity-50 disabled:shadow-none transition-all flex items-center gap-2"
                   >
-                    <div className="w-8 h-8 rounded-full bg-slate-100 dark:bg-dark-bg flex items-center justify-center group-hover:bg-slate-900 dark:group-hover:bg-blue-600 group-hover:text-white transition-colors">
-                        <Plus size={18} />
-                    </div>
-                    <span className="text-sm font-semibold">Custom</span>
+                    <Plus size={18} /> Add
                   </button>
-              ) : (
-                  <div className="col-span-1 p-4 rounded-3xl bg-white dark:bg-dark-card shadow-lg flex flex-col justify-between animate-fade-in border border-slate-100 dark:border-dark-border">
-                     <input 
-                        autoFocus
-                        value={newInterestName}
-                        onChange={(e) => setNewInterestName(e.target.value)}
-                        placeholder="Name..."
-                        className="w-full text-sm p-2 outline-none border-b border-slate-100 dark:border-dark-border font-semibold text-slate-900 dark:text-white bg-transparent mb-2"
-                        onKeyDown={(e) => e.key === 'Enter' && addNewInterest()}
-                     />
-                     <div className="flex gap-2">
-                         <button onClick={addNewInterest} className="flex-1 bg-slate-900 dark:bg-blue-600 text-white text-xs py-2 rounded-xl font-bold">Add</button>
-                         <button onClick={() => setIsAddingInterest(false)} className="px-3 bg-slate-100 dark:bg-dark-bg text-slate-400 rounded-xl hover:bg-slate-200 dark:hover:bg-dark-cardHover"><X size={14}/></button>
-                     </div>
-                  </div>
-              )}
+               </div>
             </div>
 
             <button 

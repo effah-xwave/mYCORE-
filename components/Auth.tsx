@@ -79,12 +79,13 @@ export default function Auth({ onSuccess }: AuthProps) {
                 <div className="absolute inset-0 bg-navy-900 dark:bg-blue-600 rounded-[1.5rem] blur opacity-20 group-hover:opacity-30 transition-opacity" />
                 <div className="relative w-24 h-24 bg-white dark:bg-dark-card rounded-[1.5rem] flex items-center justify-center shadow-apple overflow-hidden transition-transform duration-500 hover:scale-105 border border-white/50 dark:border-white/5">
                     <img 
-                      src="/logo.png" 
-                      alt="GNG" 
+                      src="https://drive.google.com/thumbnail?id=1Cn2hUpBxHLJ_6QmG8JYxJ9mjAgpDJa5f&sz=w256" 
+                      alt="myCORE" 
                       className="w-16 h-16 object-contain"
+                      referrerPolicy="no-referrer"
                       onError={(e) => { e.currentTarget.style.display = 'none'; e.currentTarget.nextElementSibling?.classList.remove('hidden'); }}
                     />
-                    <span className="hidden text-3xl font-bold text-navy-900 dark:text-white tracking-tighter">GN</span>
+                    <span className="hidden text-3xl font-bold text-navy-900 dark:text-white tracking-tighter">CORE</span>
                 </div>
             </div>
           </div>

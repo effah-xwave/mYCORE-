@@ -98,8 +98,15 @@ export default function GrowthChatbot() {
       {/* Header */}
       <div className="p-6 border-b border-slate-100 dark:border-dark-border flex items-center justify-between bg-slate-50/50 dark:bg-dark-bg/30">
         <div className="flex items-center gap-4">
-          <div className="w-12 h-12 rounded-2xl bg-blue-600 flex items-center justify-center text-white shadow-glow">
-            <Sparkles size={24} />
+          <div className="w-12 h-12 rounded-2xl bg-white dark:bg-dark-card flex items-center justify-center shadow-glow overflow-hidden border border-slate-200 dark:border-dark-border">
+            <img 
+              src="https://drive.google.com/thumbnail?id=1Cn2hUpBxHLJ_6QmG8JYxJ9mjAgpDJa5f&sz=w128" 
+              alt="CORE AI" 
+              className="w-8 h-8 object-contain"
+              referrerPolicy="no-referrer"
+              onError={(e) => { e.currentTarget.style.display = 'none'; e.currentTarget.nextElementSibling?.classList.remove('hidden'); }}
+            />
+            <span className="hidden text-xs font-bold text-blue-500">CORE</span>
           </div>
           <div>
             <h2 className="text-xl font-bold text-slate-900 dark:text-white tracking-tight">{coachName}</h2>
@@ -138,8 +145,19 @@ export default function GrowthChatbot() {
               className={`flex ${m.role === 'user' ? 'justify-end' : 'justify-start'}`}
             >
               <div className={`flex gap-3 max-w-[85%] ${m.role === 'user' ? 'flex-row-reverse' : 'flex-row'}`}>
-                <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${m.role === 'user' ? 'bg-slate-900 dark:bg-blue-600 text-white' : 'bg-slate-100 dark:bg-white/10 text-blue-500'}`}>
-                  {m.role === 'user' ? <UserIcon size={18} /> : <Bot size={18} />}
+                <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 overflow-hidden ${m.role === 'user' ? 'bg-slate-900 dark:bg-blue-600 text-white' : 'bg-white dark:bg-dark-card border border-slate-200 dark:border-dark-border'}`}>
+                  {m.role === 'user' ? <UserIcon size={18} /> : (
+                    <>
+                      <img 
+                        src="https://drive.google.com/thumbnail?id=1Cn2hUpBxHLJ_6QmG8JYxJ9mjAgpDJa5f&sz=w128" 
+                        alt="CORE" 
+                        className="w-6 h-6 object-contain"
+                        referrerPolicy="no-referrer"
+                        onError={(e) => { e.currentTarget.style.display = 'none'; e.currentTarget.nextElementSibling?.classList.remove('hidden'); }}
+                      />
+                      <span className="hidden text-[10px] font-bold text-blue-500">CORE</span>
+                    </>
+                  )}
                 </div>
                 <div className={`p-4 rounded-3xl text-sm leading-relaxed ${m.role === 'user' ? 'bg-slate-900 dark:bg-blue-600 text-white rounded-tr-none' : 'bg-slate-50 dark:bg-white/5 text-slate-800 dark:text-slate-200 rounded-tl-none border border-slate-100 dark:border-white/5'}`}>
                   <div className="markdown-body prose dark:prose-invert prose-sm max-w-none">
@@ -159,8 +177,15 @@ export default function GrowthChatbot() {
             className="flex justify-start"
           >
             <div className="flex gap-3">
-              <div className="w-10 h-10 rounded-xl bg-slate-100 dark:bg-white/10 text-blue-500 flex items-center justify-center">
-                <Bot size={18} />
+              <div className="w-10 h-10 rounded-xl bg-white dark:bg-dark-card border border-slate-200 dark:border-dark-border flex items-center justify-center shrink-0 overflow-hidden">
+                <img 
+                  src="https://drive.google.com/thumbnail?id=1Cn2hUpBxHLJ_6QmG8JYxJ9mjAgpDJa5f&sz=w128" 
+                  alt="CORE" 
+                  className="w-6 h-6 object-contain animate-pulse"
+                  referrerPolicy="no-referrer"
+                  onError={(e) => { e.currentTarget.style.display = 'none'; e.currentTarget.nextElementSibling?.classList.remove('hidden'); }}
+                />
+                <span className="hidden text-[10px] font-bold text-blue-500">CORE</span>
               </div>
               <div className="p-4 rounded-3xl bg-slate-50 dark:bg-white/5 text-slate-400 rounded-tl-none border border-slate-100 dark:border-white/5 flex items-center gap-2">
                 <Loader2 size={16} className="animate-spin" />
