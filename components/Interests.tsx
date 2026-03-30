@@ -1,5 +1,6 @@
 
 import React, { useState, useEffect } from 'react';
+import { motion } from 'framer-motion';
 import { InterestType, Habit } from '../types';
 import { useApp } from '../App';
 import { 
@@ -128,9 +129,11 @@ export default function Interests() {
                         <span>{Math.round(progressToNextLevel)}% to Lvl {level + 1}</span>
                     </div>
                     <div className="h-3 w-full bg-white/10 dark:bg-white/5 rounded-full overflow-hidden border border-white/5">
-                        <div 
-                            className="h-full bg-gradient-to-r from-blue-400 via-blue-500 to-purple-500 transition-all duration-1000 ease-[cubic-bezier(0.16,1,0.3,1)] shadow-[0_0_15px_rgba(59,130,246,0.5)]" 
-                            style={{ width: `${progressToNextLevel}%` }}
+                        <motion.div 
+                            initial={{ width: 0 }}
+                            animate={{ width: `${progressToNextLevel}%` }}
+                            transition={{ duration: 1.5, ease: "easeOut" }}
+                            className="h-full bg-gradient-to-r from-blue-400 via-blue-500 to-purple-500 shadow-[0_0_15px_rgba(59,130,246,0.5)]" 
                         />
                     </div>
                 </div>
@@ -228,7 +231,7 @@ export default function Interests() {
 
                 {/* Locked Future Content */}
                 <div className="bg-slate-50/50 dark:bg-white/[0.02] border border-dashed border-slate-200 dark:border-white/10 p-8 rounded-[2.5rem] flex flex-col items-center justify-center text-center gap-4 opacity-40 hover:opacity-100 transition-all duration-500 group">
-                    <div className="w-14 h-14 bg-slate-100 dark:bg-white/5 rounded-full flex items-center justify-center text-slate-400 dark:text-slate-600 group-hover:scale-110 transition-transform">
+                    <div className="w-14 h-14 bg-slate-50 dark:bg-white/5 rounded-full flex items-center justify-center text-slate-400 dark:text-slate-600 group-hover:scale-110 transition-transform">
                         <Lock size={24} />
                     </div>
                     <div>

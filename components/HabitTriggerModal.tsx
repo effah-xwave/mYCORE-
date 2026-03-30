@@ -53,20 +53,20 @@ export default function HabitTriggerModal({ habit, onClose, onConfirm, initialVa
     if (step === 'log_progress' && habit.goal) {
         return (
             <div className="text-center space-y-4">
-                 <div className="w-16 h-16 bg-blue-50 rounded-full flex items-center justify-center mx-auto text-blue-600">
+                 <div className="w-16 h-16 bg-blue-50 dark:bg-blue-500/10 rounded-full flex items-center justify-center mx-auto text-blue-600 dark:text-blue-400">
                     <Target size={32} />
                 </div>
-                <h3 className="font-bold text-xl">Log Progress</h3>
-                <p className="text-slate-500">
-                    Goal: <span className="font-bold text-navy-900">{habit.goal.target} {habit.goal.unit}</span>
+                <h3 className="font-bold text-xl text-slate-900 dark:text-white">Log Progress</h3>
+                <p className="text-slate-500 dark:text-slate-400">
+                    Goal: <span className="font-bold text-slate-900 dark:text-white">{habit.goal.target} {habit.goal.unit}</span>
                 </p>
-                <div className="bg-slate-50 p-4 rounded-xl border border-slate-200">
-                    <label className="text-xs text-slate-400 block mb-1 text-left">Today's Total ({habit.goal.unit}):</label>
+                <div className="bg-slate-50 dark:bg-dark-bg p-4 rounded-xl border border-slate-200 dark:border-dark-border">
+                    <label className="text-xs text-slate-400 dark:text-slate-500 block mb-1 text-left">Today's Total ({habit.goal.unit}):</label>
                     <input 
                         type="number" 
                         value={inputValue} 
                         onChange={(e) => setInputValue(e.target.value)}
-                        className="w-full bg-white border border-slate-300 rounded-lg px-3 py-2 text-lg font-bold text-center outline-none focus:border-navy-900 transition-colors"
+                        className="w-full bg-white dark:bg-dark-bg border border-slate-300 dark:border-dark-border rounded-lg px-3 py-2 text-lg font-bold text-center outline-none focus:border-blue-500 dark:text-white transition-colors"
                         placeholder="0"
                         autoFocus
                     />
@@ -79,7 +79,7 @@ export default function HabitTriggerModal({ habit, onClose, onConfirm, initialVa
                         }
                     }} 
                     disabled={!inputValue}
-                    className="w-full bg-navy-900 disabled:bg-slate-300 text-white py-3 rounded-xl font-medium"
+                    className="w-full bg-slate-900 dark:bg-blue-600 disabled:bg-slate-300 dark:disabled:bg-slate-800 text-white py-3 rounded-xl font-medium transition-all"
                 >
                     Update Progress
                 </button>
@@ -90,9 +90,9 @@ export default function HabitTriggerModal({ habit, onClose, onConfirm, initialVa
     if (step === 'verifying') {
         return (
             <div className="flex flex-col items-center justify-center py-8 animate-pulse">
-                <Loader2 className="w-12 h-12 text-navy-900 animate-spin mb-4" />
-                <h3 className="font-semibold text-lg">Verifying Signal...</h3>
-                <p className="text-slate-400 text-sm">Connecting to {habit.triggerType.toLowerCase()} service</p>
+                <Loader2 className="w-12 h-12 text-slate-900 dark:text-blue-500 animate-spin mb-4" />
+                <h3 className="font-semibold text-lg text-slate-900 dark:text-white">Verifying Signal...</h3>
+                <p className="text-slate-400 dark:text-slate-500 text-sm">Connecting to {habit.triggerType.toLowerCase()} service</p>
             </div>
         )
     }
@@ -100,19 +100,19 @@ export default function HabitTriggerModal({ habit, onClose, onConfirm, initialVa
     if (step === 'screen_time_success') {
         return (
             <div className="text-center space-y-4 animate-fade-in">
-                <div className="w-16 h-16 bg-green-50 rounded-full flex items-center justify-center mx-auto text-green-600">
+                <div className="w-16 h-16 bg-green-50 dark:bg-green-500/10 rounded-full flex items-center justify-center mx-auto text-green-600 dark:text-green-400">
                     <CheckCircle2 size={32} />
                 </div>
-                <h3 className="font-bold text-xl text-navy-900">Target Met!</h3>
-                <p className="text-slate-500">
-                    Your screen time of <span className="font-bold text-navy-900">{inputValue} min</span> is well within your {habit.triggerConfig?.thresholdMinutes} min limit.
+                <h3 className="font-bold text-xl text-slate-900 dark:text-white">Target Met!</h3>
+                <p className="text-slate-500 dark:text-slate-400">
+                    Your screen time of <span className="font-bold text-slate-900 dark:text-white">{inputValue} min</span> is well within your {habit.triggerConfig?.thresholdMinutes} min limit.
                 </p>
-                <div className="bg-slate-50 p-4 rounded-xl text-sm text-slate-500 italic">
+                <div className="bg-slate-50 dark:bg-dark-bg p-4 rounded-xl text-sm text-slate-500 dark:text-slate-400 italic">
                     "Discipline is choosing between what you want now and what you want most."
                 </div>
                 <button 
                     onClick={() => onConfirm(parseInt(inputValue))} 
-                    className="w-full bg-navy-900 text-white py-3 rounded-xl font-medium mt-2 shadow-lg hover:shadow-xl hover:-translate-y-0.5 transition-all"
+                    className="w-full bg-slate-900 dark:bg-blue-600 text-white py-3 rounded-xl font-medium mt-2 shadow-lg hover:shadow-xl hover:-translate-y-0.5 transition-all"
                 >
                     Confirm & Log Habit
                 </button>
@@ -123,16 +123,16 @@ export default function HabitTriggerModal({ habit, onClose, onConfirm, initialVa
     if (step === 'location_success') {
         return (
             <div className="text-center space-y-4 animate-fade-in">
-                <div className="w-16 h-16 bg-green-50 rounded-full flex items-center justify-center mx-auto text-green-600">
+                <div className="w-16 h-16 bg-green-50 dark:bg-green-500/10 rounded-full flex items-center justify-center mx-auto text-green-600 dark:text-green-400">
                     <CheckCircle2 size={32} />
                 </div>
-                <h3 className="font-bold text-xl text-navy-900">You're Here!</h3>
-                <p className="text-slate-500">
-                    Location verified at <br/> <span className="font-bold text-navy-900">{habit.triggerConfig?.locationName}</span>
+                <h3 className="font-bold text-xl text-slate-900 dark:text-white">You're Here!</h3>
+                <p className="text-slate-500 dark:text-slate-400">
+                    Location verified at <br/> <span className="font-bold text-slate-900 dark:text-white">{habit.triggerConfig?.locationName}</span>
                 </p>
                 <button 
                     onClick={() => onConfirm()} 
-                    className="w-full bg-navy-900 text-white py-3 rounded-xl font-medium mt-2 shadow-lg hover:shadow-xl hover:-translate-y-0.5 transition-all"
+                    className="w-full bg-slate-900 dark:bg-blue-600 text-white py-3 rounded-xl font-medium mt-2 shadow-lg hover:shadow-xl hover:-translate-y-0.5 transition-all"
                 >
                     Check In & Complete
                 </button>
@@ -144,15 +144,15 @@ export default function HabitTriggerModal({ habit, onClose, onConfirm, initialVa
         case TriggerType.LOCATION:
             return (
                 <div className="text-center space-y-4">
-                    <div className="w-16 h-16 bg-blue-50 rounded-full flex items-center justify-center mx-auto text-blue-600">
+                    <div className="w-16 h-16 bg-blue-50 dark:bg-blue-500/10 rounded-full flex items-center justify-center mx-auto text-blue-600 dark:text-blue-400">
                         <MapPin size={32} />
                     </div>
-                    <h3 className="font-bold text-xl">Simulate Location</h3>
-                    <p className="text-slate-500">
+                    <h3 className="font-bold text-xl text-slate-900 dark:text-white">Simulate Location</h3>
+                    <p className="text-slate-500 dark:text-slate-400">
                         Pretend you just walked into the geofence for: <br/>
-                        <span className="font-semibold text-navy-900">{habit.triggerConfig?.locationName}</span>
+                        <span className="font-semibold text-slate-900 dark:text-white">{habit.triggerConfig?.locationName}</span>
                     </p>
-                    <button onClick={handleAction} className="w-full bg-navy-900 text-white py-3 rounded-xl font-medium mt-4 hover:bg-navy-800 transition-colors">
+                    <button onClick={handleAction} className="w-full bg-slate-900 dark:bg-blue-600 text-white py-3 rounded-xl font-medium mt-4 hover:bg-slate-800 dark:hover:bg-blue-700 transition-colors">
                         Arrive at Location
                     </button>
                 </div>
@@ -160,20 +160,20 @@ export default function HabitTriggerModal({ habit, onClose, onConfirm, initialVa
         case TriggerType.SCREEN_TIME:
             return (
                 <div className="text-center space-y-4">
-                     <div className="w-16 h-16 bg-purple-50 rounded-full flex items-center justify-center mx-auto text-purple-600">
+                     <div className="w-16 h-16 bg-purple-50 dark:bg-purple-500/10 rounded-full flex items-center justify-center mx-auto text-purple-600 dark:text-purple-400">
                         <Smartphone size={32} />
                     </div>
-                    <h3 className="font-bold text-xl">Daily Screen Time</h3>
-                    <p className="text-slate-500">
+                    <h3 className="font-bold text-xl text-slate-900 dark:text-white">Daily Screen Time</h3>
+                    <p className="text-slate-500 dark:text-slate-400">
                         Goal: Less than {habit.triggerConfig?.thresholdMinutes} minutes.
                     </p>
-                    <div className="bg-slate-50 p-4 rounded-xl border border-slate-200">
-                        <label className="text-xs text-slate-400 block mb-1 text-left">Input simulated usage (min):</label>
+                    <div className="bg-slate-50 dark:bg-dark-bg p-4 rounded-xl border border-slate-200 dark:border-dark-border">
+                        <label className="text-xs text-slate-400 dark:text-slate-500 block mb-1 text-left">Input simulated usage (min):</label>
                         <input 
                             type="number" 
                             value={inputValue} 
                             onChange={(e) => setInputValue(e.target.value)}
-                            className="w-full bg-white border border-slate-300 rounded-lg px-3 py-2 text-lg font-bold text-center outline-none focus:border-navy-900 transition-colors"
+                            className="w-full bg-white dark:bg-dark-bg border border-slate-300 dark:border-dark-border rounded-lg px-3 py-2 text-lg font-bold text-center outline-none focus:border-blue-500 dark:text-white transition-colors"
                             placeholder="e.g. 25"
                         />
                     </div>
@@ -187,7 +187,7 @@ export default function HabitTriggerModal({ habit, onClose, onConfirm, initialVa
                             }
                         }} 
                         disabled={!inputValue}
-                        className="w-full bg-navy-900 disabled:bg-slate-300 text-white py-3 rounded-xl font-medium"
+                        className="w-full bg-slate-900 dark:bg-blue-600 disabled:bg-slate-300 dark:disabled:bg-slate-800 text-white py-3 rounded-xl font-medium transition-all"
                     >
                         Verify Usage
                     </button>
@@ -198,42 +198,42 @@ export default function HabitTriggerModal({ habit, onClose, onConfirm, initialVa
             if (habit.triggerConfig?.actionDetail) {
                 return (
                     <div className="text-center space-y-4">
-                        <div className="w-16 h-16 bg-green-50 rounded-full flex items-center justify-center mx-auto text-green-600">
+                        <div className="w-16 h-16 bg-green-50 dark:bg-green-500/10 rounded-full flex items-center justify-center mx-auto text-green-600 dark:text-green-400">
                             <TrendingUp size={32} />
                         </div>
-                        <h3 className="font-bold text-xl">Market Update</h3>
-                        <p className="text-slate-500 text-sm">
+                        <h3 className="font-bold text-xl text-slate-900 dark:text-white">Market Update</h3>
+                        <p className="text-slate-500 dark:text-slate-400 text-sm">
                             {habit.triggerConfig.actionDetail} via {habit.triggerConfig.appName}
                         </p>
 
                         {!stockSim.done ? (
-                            <div className="bg-slate-50 p-4 rounded-xl border border-slate-200 space-y-3">
-                                <div className="flex items-center gap-2 bg-white border border-slate-200 rounded-lg p-2">
+                            <div className="bg-slate-50 dark:bg-dark-bg p-4 rounded-xl border border-slate-200 dark:border-dark-border space-y-3">
+                                <div className="flex items-center gap-2 bg-white dark:bg-dark-card border border-slate-200 dark:border-dark-border rounded-lg p-2">
                                     <Search size={16} className="text-slate-400"/>
-                                    <span className="text-sm font-semibold text-slate-700">SPX</span>
+                                    <span className="text-sm font-semibold text-slate-700 dark:text-slate-300">SPX</span>
                                 </div>
                                 <button 
                                     onClick={handleStockCheck}
                                     disabled={stockSim.loading}
-                                    className="w-full bg-navy-900 text-white py-2 rounded-lg font-medium text-sm flex items-center justify-center gap-2"
+                                    className="w-full bg-slate-900 dark:bg-blue-600 text-white py-2 rounded-lg font-medium text-sm flex items-center justify-center gap-2 transition-all"
                                 >
                                     {stockSim.loading ? <Loader2 size={16} className="animate-spin" /> : 'Get Live Price'}
                                 </button>
                             </div>
                         ) : (
-                            <div className="bg-white p-4 rounded-xl border border-slate-100 shadow-sm animate-fade-in-up">
-                                <div className="text-xs text-slate-400 uppercase font-bold mb-1">S&P 500 Index</div>
-                                <div className="text-3xl font-bold text-navy-900">
+                            <div className="bg-white dark:bg-dark-bg p-4 rounded-xl border border-slate-100 dark:border-dark-border shadow-sm animate-fade-in-up">
+                                <div className="text-xs text-slate-400 dark:text-slate-500 uppercase font-bold mb-1">S&P 500 Index</div>
+                                <div className="text-3xl font-bold text-slate-900 dark:text-white">
                                     {stockSim.price.toFixed(2)}
                                 </div>
-                                <div className="text-green-500 font-semibold text-sm flex items-center justify-center gap-1">
+                                <div className="text-green-500 dark:text-green-400 font-semibold text-sm flex items-center justify-center gap-1">
                                     <TrendingUp size={14} /> +{stockSim.change.toFixed(2)}%
                                 </div>
                             </div>
                         )}
                         
                         {stockSim.done && (
-                             <p className="text-xs text-slate-400 italic">Syncing to habit log...</p>
+                             <p className="text-xs text-slate-400 dark:text-slate-500 italic">Syncing to habit log...</p>
                         )}
                     </div>
                 )
@@ -242,15 +242,15 @@ export default function HabitTriggerModal({ habit, onClose, onConfirm, initialVa
             // Default App Open
             return (
                 <div className="text-center space-y-4">
-                     <div className="w-16 h-16 bg-orange-50 rounded-full flex items-center justify-center mx-auto text-orange-600">
+                     <div className="w-16 h-16 bg-orange-50 dark:bg-orange-500/10 rounded-full flex items-center justify-center mx-auto text-orange-600 dark:text-orange-400">
                         <Zap size={32} />
                     </div>
-                    <h3 className="font-bold text-xl">App Interaction</h3>
-                    <p className="text-slate-500">
+                    <h3 className="font-bold text-xl text-slate-900 dark:text-white">App Interaction</h3>
+                    <p className="text-slate-500 dark:text-slate-400">
                         Simulate opening the required app: <br/>
-                        <span className="font-semibold text-navy-900">{habit.triggerConfig?.appName}</span>
+                        <span className="font-semibold text-slate-900 dark:text-white">{habit.triggerConfig?.appName}</span>
                     </p>
-                     <button onClick={handleAction} className="w-full bg-navy-900 text-white py-3 rounded-xl font-medium mt-4">
+                     <button onClick={handleAction} className="w-full bg-slate-900 dark:bg-blue-600 text-white py-3 rounded-xl font-medium mt-4 transition-all">
                         Launch App & Read
                     </button>
                 </div>
@@ -260,9 +260,9 @@ export default function HabitTriggerModal({ habit, onClose, onConfirm, initialVa
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-navy-900/40 backdrop-blur-sm animate-fade-in">
-        <div className="bg-white rounded-3xl w-full max-w-sm p-6 shadow-2xl relative overflow-hidden">
-            <button onClick={onClose} className="absolute top-4 right-4 text-slate-400 hover:text-slate-600">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/60 backdrop-blur-sm animate-fade-in">
+        <div className="bg-white dark:bg-dark-card rounded-3xl w-full max-w-sm p-6 shadow-2xl relative overflow-hidden border border-slate-200 dark:border-dark-border">
+            <button onClick={onClose} className="absolute top-4 right-4 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition-colors">
                 ✕
             </button>
             {renderContent()}

@@ -1,5 +1,6 @@
 
 import React, { useState, useEffect, createContext, useContext } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { User, Habit, HabitInstance, InterestType, Task, Project } from './types';
 import { db } from './services/mockDb';
 import { AuthService } from './services/auth';
@@ -9,7 +10,7 @@ import { NotificationService } from './services/notificationService';
 // Icons
 import { 
   LayoutDashboard, Compass, BarChart2, Settings, Loader2, CheckSquare, 
-  LogOut, Sun, Moon, Search, Bell, Menu, X, Briefcase, Navigation
+  LogOut, Sun, Moon, Search, Bell, Menu, X, Briefcase, Navigation, Sparkles
 } from 'lucide-react';
 
 // Components
@@ -22,6 +23,7 @@ import SettingsPage from './components/SettingsPage';
 import TasksPage from './components/TasksPage';
 import ProjectsPage from './components/ProjectsPage';
 import MapsAgent from './components/MapsAgent';
+import GrowthChatbot from './components/GrowthChatbot';
 import LoadingTransition from './components/LoadingTransition';
 
 // --- CONTEXT ---
@@ -52,6 +54,9 @@ export interface AppContextType {
   deleteTask: (taskId: string) => Promise<void>;
   // Habit Helpers
   toggleHabitFavorite: (habitId: string) => Promise<void>;
+  getInstancesForRange: (startDate: string, endDate: string) => Promise<HabitInstance[]>;
+  // Coach
+  updateCoachName: (newName: string) => Promise<void>;
   // Theme
   theme: 'light' | 'dark';
   toggleTheme: () => void;
@@ -298,12 +303,21 @@ export default function App() {
     await refreshData();
   };
 
+  const getInstancesForRange = async (startDate: string, endDate: string) => {
+    return await db.getInstancesForRange(startDate, endDate);
+  };
+
+  const updateCoachName = async (newName: string) => {
+    await db.updateCoachName(newName);
+    await refreshData();
+  };
+
 
   if (isLoading) {
     return (
-      <div className="h-screen w-full flex items-center justify-center bg-slate-200 dark:bg-dark-bg text-slate-900 dark:text-white relative overflow-hidden transition-colors duration-500">
+      <div className="h-screen w-full flex items-center justify-center bg-slate-50 dark:bg-dark-bg text-slate-900 dark:text-white relative overflow-hidden transition-colors duration-500">
         <div className="relative z-10 flex flex-col items-center">
-            <Loader2 className="w-10 h-10 animate-spin text-slate-900/50 dark:text-white/50 mb-4" />
+            <Loader2 className="w-10 h-10 animate-spin text-slate-400 dark:text-white/50 mb-4" />
             <p className="text-sm font-medium opacity-50">Loading Core...</p>
         </div>
       </div>
@@ -315,6 +329,8 @@ export default function App() {
     activeTab, setActiveTab, completeOnboarding, handleTrigger, 
     updateSettings, resetApp, isAuthenticated, handleLoginSuccess,
     addTask, updateTask, toggleTask, addProject, updateProject, deleteProject, deleteTask, toggleHabitFavorite,
+    getInstancesForRange,
+    updateCoachName,
     theme, toggleTheme
   };
 
@@ -330,7 +346,7 @@ export default function App() {
       ) : !user?.onboarded ? (
         <Onboarding />
       ) : (
-        <div className="flex h-screen bg-slate-200 dark:bg-dark-bg transition-colors duration-500 font-sans text-slate-900 dark:text-dark-text overflow-hidden relative">
+        <div className="flex h-screen bg-slate-50 dark:bg-dark-bg transition-colors duration-500 font-sans text-slate-900 dark:text-dark-text overflow-hidden relative">
           
           {/* LIQUID GLASS AMBIENT BACKGROUND (Light Mode Only) */}
           <div className="absolute inset-0 z-0 pointer-events-none overflow-hidden dark:opacity-0 transition-opacity duration-1000">
@@ -340,19 +356,20 @@ export default function App() {
           </div>
 
           {/* SIDEBAR NAVIGATION (Desktop) */}
-          <aside className="hidden md:flex flex-col w-20 lg:w-72 bg-slate-300/60 dark:bg-dark-card backdrop-blur-2xl border-r border-slate-400/50 dark:border-dark-border transition-all duration-300 z-50">
-             <div className="h-20 flex items-center justify-center lg:justify-start lg:px-8 border-b border-slate-400/20 dark:border-dark-border/50">
+          <aside className="hidden md:flex flex-col w-20 lg:w-72 bg-white dark:bg-dark-card backdrop-blur-2xl border-r border-slate-200 dark:border-dark-border transition-all duration-300 z-50">
+             <div className="h-20 flex items-center justify-center lg:justify-start lg:px-8 border-b border-slate-100 dark:border-dark-border/50">
                 <div className="relative group flex items-center gap-3">
-                  <div className="w-10 h-10 bg-slate-800 dark:bg-blue-600 rounded-xl flex items-center justify-center text-white font-bold text-sm shadow-glow transition-all group-hover:scale-110">
+                  <div className="w-10 h-10 bg-slate-900 dark:bg-blue-600 rounded-xl flex items-center justify-center text-white font-bold text-sm shadow-glow transition-all group-hover:scale-110">
                     GN
                   </div>
-                  <span className="hidden lg:block font-display font-bold text-2xl tracking-tight">myCORE</span>
+                  <span className="hidden lg:block font-display font-bold text-2xl tracking-tight text-slate-900 dark:text-white">myCORE</span>
                 </div>
              </div>
 
              <nav className="flex-1 py-8 flex flex-col gap-1.5 px-4">
                 {[
                   { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
+                  { id: 'growth', label: 'Growth AI', icon: Sparkles },
                   { id: 'projects', label: 'Projects', icon: Briefcase },
                   { id: 'tasks', label: 'Tasks', icon: CheckSquare },
                   { id: 'navigator', label: 'Navigator', icon: Navigation },
@@ -364,26 +381,29 @@ export default function App() {
                     key={tab.id}
                     onClick={() => setActiveTab(tab.id)}
                     className={`
-                      relative group flex items-center gap-3 px-4 py-3.5 rounded-2xl transition-all duration-200
+                      relative group flex items-center gap-3 px-4 py-3.5 rounded-2xl transition-all duration-300
                       ${activeTab === tab.id 
-                        ? 'bg-slate-800 text-white dark:bg-white dark:text-black shadow-lg shadow-slate-900/20 dark:shadow-white/10' 
-                        : 'text-slate-500 dark:text-slate-500 hover:bg-slate-300 dark:hover:bg-dark-cardHover hover:text-slate-900 dark:hover:text-white'
+                        ? 'bg-blue-600 text-white shadow-lg shadow-blue-500/20' 
+                        : 'text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-white/5 hover:text-slate-900 dark:hover:text-white'
                       }
                     `}
                   >
                     <tab.icon size={22} strokeWidth={activeTab === tab.id ? 2.5 : 2} className="shrink-0" />
                     <span className="hidden lg:block font-semibold text-[15px]">{tab.label}</span>
                     {activeTab === tab.id && (
-                        <div className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-8 bg-blue-400 rounded-r-full lg:hidden" />
+                        <motion.div 
+                          layoutId="activeTab"
+                          className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-8 bg-white rounded-r-full lg:hidden" 
+                        />
                     )}
                   </button>
                 ))}
              </nav>
 
-             <div className="p-6 border-t border-slate-400/20 dark:border-dark-border">
+             <div className="p-6 border-t border-slate-100 dark:border-dark-border">
                 <button 
                   onClick={resetApp}
-                  className="w-full flex items-center gap-3 px-4 py-3.5 rounded-2xl text-slate-500 hover:bg-red-100 hover:text-red-600 dark:hover:bg-red-900/10 transition-all font-medium"
+                  className="w-full flex items-center gap-3 px-4 py-3.5 rounded-2xl text-slate-500 hover:bg-red-50 hover:text-red-600 dark:hover:bg-red-900/10 transition-all font-medium"
                 >
                   <LogOut size={22} />
                   <span className="hidden lg:block text-[15px]">Logout</span>
@@ -395,7 +415,7 @@ export default function App() {
           <div className="flex-1 flex flex-col h-full overflow-hidden relative z-10">
              
              {/* TOP HEADER */}
-             <header className="h-20 bg-slate-300/60 dark:bg-dark-bg/80 backdrop-blur-xl border-b border-slate-400/50 dark:border-dark-border flex items-center justify-between px-8 z-40 transition-colors duration-300">
+             <header className="h-20 bg-white/80 dark:bg-dark-bg/80 backdrop-blur-xl border-b border-slate-200 dark:border-dark-border flex items-center justify-between px-8 z-40 transition-colors duration-300">
                 
                 {/* Mobile Menu Trigger */}
                 <button 
@@ -406,7 +426,7 @@ export default function App() {
                 </button>
 
                 {/* Search Bar */}
-                <div className="hidden md:flex items-center gap-3 bg-slate-300 dark:bg-dark-card px-5 py-2.5 rounded-2xl w-full max-w-md border border-slate-400/60 dark:border-dark-border focus-within:border-blue-500 transition-all shadow-sm">
+                <div className="hidden md:flex items-center gap-3 bg-slate-50 dark:bg-dark-card px-5 py-2.5 rounded-2xl w-full max-w-md border border-slate-200 dark:border-dark-border focus-within:border-blue-500 transition-all shadow-sm">
                    <Search size={18} className="text-slate-400" />
                    <input 
                       placeholder="Search anything..." 
@@ -418,17 +438,17 @@ export default function App() {
                 <div className="flex items-center gap-5">
                    <button 
                       onClick={toggleTheme}
-                      className="w-11 h-11 rounded-2xl flex items-center justify-center text-slate-600 hover:bg-slate-300 dark:text-slate-400 dark:hover:bg-dark-cardHover transition-all border border-transparent hover:border-slate-400/20 dark:hover:border-dark-border"
+                      className="w-11 h-11 rounded-2xl flex items-center justify-center text-slate-600 hover:bg-slate-100 dark:text-slate-400 dark:hover:bg-dark-cardHover transition-all border border-transparent hover:border-slate-200 dark:hover:border-dark-border"
                    >
                       {theme === 'light' ? <Moon size={20} /> : <Sun size={20} />}
                    </button>
                    
-                   <button className="w-11 h-11 rounded-2xl flex items-center justify-center text-slate-600 hover:bg-slate-300 dark:text-slate-400 dark:hover:bg-dark-cardHover transition-all border border-transparent hover:border-slate-400/20 dark:hover:border-dark-border relative">
+                   <button className="w-11 h-11 rounded-2xl flex items-center justify-center text-slate-600 hover:bg-slate-100 dark:text-slate-400 dark:hover:bg-dark-cardHover transition-all border border-transparent hover:border-slate-200 dark:hover:border-dark-border relative">
                       <Bell size={20} />
-                      <span className="absolute top-3 right-3.5 w-2 h-2 bg-blue-500 rounded-full border-2 border-slate-200 dark:border-dark-card" />
+                      <span className="absolute top-3 right-3.5 w-2 h-2 bg-blue-500 rounded-full border-2 border-white dark:border-dark-card" />
                    </button>
 
-                   <div className="hidden sm:flex items-center gap-4 pl-5 border-l border-slate-400/30 dark:border-dark-border">
+                   <div className="hidden sm:flex items-center gap-4 pl-5 border-l border-slate-200 dark:border-dark-border">
                       <div className="text-right">
                          <div className="text-sm font-bold text-slate-900 dark:text-white leading-none">{user?.name}</div>
                          <div className="text-[10px] font-bold text-blue-500 uppercase tracking-widest mt-1.5">Premium Member</div>
@@ -444,6 +464,7 @@ export default function App() {
              <main className="flex-1 overflow-y-auto p-4 md:p-8 scroll-smooth">
                 <div className="max-w-7xl mx-auto animate-fade-in">
                   {activeTab === 'dashboard' && <Dashboard />}
+                  {activeTab === 'growth' && <GrowthChatbot />}
                   {activeTab === 'projects' && <ProjectsPage />}
                   {activeTab === 'tasks' && <TasksPage />}
                   {activeTab === 'navigator' && <MapsAgent />}
@@ -458,14 +479,15 @@ export default function App() {
           {isMobileMenuOpen && (
              <div className="fixed inset-0 z-50 md:hidden">
                 <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={() => setIsMobileMenuOpen(false)} />
-                <div className="absolute left-0 top-0 bottom-0 w-64 bg-slate-200/95 dark:bg-dark-card backdrop-blur-xl shadow-2xl p-6 animate-slide-right">
+                <div className="absolute left-0 top-0 bottom-0 w-64 bg-white dark:bg-dark-card backdrop-blur-xl shadow-2xl p-6 animate-slide-right">
                    <div className="flex items-center justify-between mb-8">
-                      <div className="font-bold text-xl dark:text-white">myCORE</div>
-                      <button onClick={() => setIsMobileMenuOpen(false)}><X className="dark:text-white"/></button>
+                      <div className="font-bold text-xl text-slate-900 dark:text-white">myCORE</div>
+                      <button onClick={() => setIsMobileMenuOpen(false)}><X className="text-slate-900 dark:text-white"/></button>
                    </div>
                    <nav className="flex flex-col gap-2">
                       {[
                         { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
+                        { id: 'growth', label: 'Growth AI', icon: Sparkles },
                         { id: 'projects', label: 'Projects', icon: Briefcase },
                         { id: 'tasks', label: 'Tasks', icon: CheckSquare },
                         { id: 'navigator', label: 'Navigator', icon: Navigation },
@@ -476,13 +498,13 @@ export default function App() {
                         <button
                           key={tab.id}
                           onClick={() => { setActiveTab(tab.id); setIsMobileMenuOpen(false); }}
-                          className={`flex items-center gap-3 p-3 rounded-xl font-medium ${activeTab === tab.id ? 'bg-slate-800 text-white dark:bg-blue-600' : 'text-slate-500 dark:text-slate-400'}`}
+                          className={`flex items-center gap-3 p-4 rounded-2xl font-bold transition-all duration-300 ${activeTab === tab.id ? 'bg-blue-600 text-white shadow-lg shadow-blue-500/20' : 'text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-white/5'}`}
                         >
                           <tab.icon size={20} /> {tab.label}
                         </button>
                       ))}
                    </nav>
-                   <div className="mt-auto pt-6 border-t dark:border-dark-border">
+                   <div className="mt-auto pt-6 border-t border-slate-100 dark:border-dark-border">
                       <button onClick={resetApp} className="flex items-center gap-3 text-red-500 font-medium"><LogOut size={20}/> Logout</button>
                    </div>
                 </div>

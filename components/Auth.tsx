@@ -63,7 +63,7 @@ export default function Auth({ onSuccess }: AuthProps) {
   };
 
   return (
-    <div className="min-h-screen bg-[#F8F9FA] dark:bg-dark-bg flex items-center justify-center p-6 relative overflow-hidden isolate transition-colors duration-500">
+    <div className="min-h-screen bg-slate-50 dark:bg-dark-bg flex items-center justify-center p-6 relative overflow-hidden isolate transition-colors duration-500">
       {/* Refined Ambient Background with Animation */}
       <div className="absolute inset-0 z-0">
           <div className="absolute top-[-20%] left-[-20%] w-[70vw] h-[70vw] bg-blue-300/30 dark:bg-blue-900/20 rounded-full blur-[100px] mix-blend-multiply dark:mix-blend-screen animate-blob" />

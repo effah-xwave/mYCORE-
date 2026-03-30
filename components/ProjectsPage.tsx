@@ -1,5 +1,6 @@
 
 import React, { useState } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { useApp } from '../App';
 import { Project, Task, Priority } from '../types';
 import { 
@@ -17,10 +18,21 @@ const ProjectDetailModal: React.FC<{ project: Project; tasks: Task[]; onClose: (
   const [manualProgress, setManualProgress] = useState(project.progress);
   const themeColor = project.color || '#3B82F6';
   
+  // Sync state if project updates externally
+  React.useEffect(() => {
+    setManualProgress(project.progress);
+  }, [project.progress]);
+
   const handleProgressChange = (newVal: number) => {
     const clamped = Math.min(100, Math.max(0, newVal));
     setManualProgress(clamped);
-    updateProject(project.id, { progress: clamped });
+    
+    // Auto-update status if progress hits 100%
+    const newStatus = clamped === 100 ? 'completed' : 'active';
+    updateProject(project.id, { 
+      progress: clamped,
+      status: project.status === 'archived' ? 'archived' : newStatus
+    });
   };
 
   const handleArchive = () => {
@@ -36,11 +48,11 @@ const ProjectDetailModal: React.FC<{ project: Project; tasks: Task[]; onClose: (
   };
 
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 md:p-8 bg-slate-900/60 backdrop-blur-md animate-fade-in">
-      <div className="bg-slate-100 dark:bg-dark-card w-full max-w-4xl max-h-[90vh] rounded-[2.5rem] shadow-2xl border border-white/20 dark:border-dark-border flex flex-col md:flex-row overflow-hidden animate-scale-in">
+    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 md:p-8 bg-slate-950/60 backdrop-blur-md animate-fade-in">
+      <div className="bg-white dark:bg-dark-card w-full max-w-4xl max-h-[90vh] rounded-[2.5rem] shadow-2xl border border-slate-200 dark:border-dark-border flex flex-col md:flex-row overflow-hidden animate-scale-in">
         
         {/* Left Panel: Info */}
-        <div className="w-full md:w-2/5 p-8 bg-slate-200/50 dark:bg-dark-bg/50 border-r border-slate-100 dark:border-dark-border flex flex-col">
+        <div className="w-full md:w-2/5 p-8 bg-slate-50 dark:bg-dark-bg/50 border-r border-slate-100 dark:border-dark-border flex flex-col">
           <div className="flex justify-between items-start mb-8">
             <div 
                 className="w-16 h-16 rounded-2xl flex items-center justify-center text-white shadow-lg transition-colors"
@@ -48,9 +60,17 @@ const ProjectDetailModal: React.FC<{ project: Project; tasks: Task[]; onClose: (
             >
               <Briefcase size={32} />
             </div>
-            <button onClick={onClose} className="md:hidden p-2 rounded-full hover:bg-slate-200 transition-colors">
-              <X size={20} className="text-slate-400" />
-            </button>
+            <div className="flex flex-col items-end gap-2">
+              <button onClick={onClose} className="p-2 rounded-full hover:bg-slate-100 dark:hover:bg-dark-cardHover transition-colors">
+                <X size={20} className="text-slate-400" />
+              </button>
+              <div 
+                className="px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-[0.15em] text-white shadow-sm"
+                style={{ backgroundColor: project.status === 'active' ? themeColor : project.status === 'completed' ? '#10B981' : '#475569' }}
+              >
+                {project.status}
+              </div>
+            </div>
           </div>
 
           <h2 className="text-3xl font-bold text-slate-900 dark:text-white leading-tight mb-4">{project.name}</h2>
@@ -61,7 +81,7 @@ const ProjectDetailModal: React.FC<{ project: Project; tasks: Task[]; onClose: (
           <div className="space-y-6 mt-auto">
              <div className="flex items-center gap-4">
                 <div 
-                    className="w-10 h-10 rounded-xl bg-slate-100 dark:bg-dark-card flex items-center justify-center border border-slate-100 dark:border-dark-border shadow-sm"
+                    className="w-10 h-10 rounded-xl bg-slate-50 dark:bg-dark-card flex items-center justify-center border border-slate-100 dark:border-dark-border shadow-sm"
                     style={{ color: themeColor }}
                 >
                    <Calendar size={18} />
@@ -72,7 +92,7 @@ const ProjectDetailModal: React.FC<{ project: Project; tasks: Task[]; onClose: (
                 </div>
              </div>
 
-             <div className="p-6 rounded-[2rem] bg-slate-100 dark:bg-dark-card border border-slate-100 dark:border-dark-border shadow-sm space-y-4">
+             <div className="p-6 rounded-[2rem] bg-slate-50 dark:bg-dark-card border border-slate-100 dark:border-dark-border shadow-sm space-y-4">
                 <div className="flex justify-between items-center">
                    <span className="text-xs font-bold text-slate-400 uppercase tracking-widest">Manual Progress</span>
                    <span className="text-xl font-bold" style={{ color: themeColor }}>{manualProgress}%</span>
@@ -84,21 +104,21 @@ const ProjectDetailModal: React.FC<{ project: Project; tasks: Task[]; onClose: (
                   max="100" 
                   value={manualProgress} 
                   onChange={(e) => handleProgressChange(parseInt(e.target.value))}
-                  className="w-full h-2 bg-slate-200 dark:bg-dark-bg rounded-full appearance-none cursor-pointer accent-current"
+                  className="w-full h-2 bg-slate-100 dark:bg-dark-bg rounded-full appearance-none cursor-pointer accent-current"
                   style={{ color: themeColor } as any}
                 />
                 
                 <div className="flex justify-between items-center pt-2">
                    <button 
                     onClick={() => handleProgressChange(manualProgress - 5)}
-                    className="p-2 rounded-xl bg-slate-200/50 dark:bg-dark-bg hover:bg-slate-200 dark:hover:bg-dark-cardHover text-slate-500 transition-all border border-slate-100 dark:border-dark-border"
+                    className="p-2 rounded-xl bg-white dark:bg-dark-bg hover:bg-slate-100 dark:hover:bg-dark-cardHover text-slate-500 transition-all border border-slate-100 dark:border-dark-border"
                    >
                      <Minus size={14} />
                    </button>
                    <span className="text-[10px] font-bold text-slate-400 uppercase">Adjust Progress</span>
                    <button 
                     onClick={() => handleProgressChange(manualProgress + 5)}
-                    className="p-2 rounded-xl bg-slate-200/50 dark:bg-dark-bg hover:bg-slate-200 dark:hover:bg-dark-cardHover text-slate-500 transition-all border border-slate-100 dark:border-dark-border"
+                    className="p-2 rounded-xl bg-white dark:bg-dark-bg hover:bg-slate-100 dark:hover:bg-dark-cardHover text-slate-500 transition-all border border-slate-100 dark:border-dark-border"
                    >
                      <Plus size={14} />
                    </button>
@@ -109,7 +129,7 @@ const ProjectDetailModal: React.FC<{ project: Project; tasks: Task[]; onClose: (
              <div className="grid grid-cols-2 gap-3 pt-4">
                 <button 
                     onClick={handleArchive}
-                    className="flex items-center justify-center gap-2 py-3 rounded-2xl bg-slate-100 dark:bg-dark-card border border-slate-100 dark:border-dark-border text-slate-600 dark:text-slate-400 font-bold text-xs hover:bg-slate-200 transition-all"
+                    className="flex items-center justify-center gap-2 py-3 rounded-2xl bg-slate-50 dark:bg-dark-card border border-slate-100 dark:border-dark-border text-slate-600 dark:text-slate-400 font-bold text-xs hover:bg-slate-100 transition-all"
                 >
                     <Archive size={14} /> {project.status === 'archived' ? 'Restore' : 'Archive'}
                 </button>
@@ -124,7 +144,7 @@ const ProjectDetailModal: React.FC<{ project: Project; tasks: Task[]; onClose: (
         </div>
 
         {/* Right Panel: Task List */}
-        <div className="flex-1 p-8 flex flex-col bg-slate-100 dark:bg-dark-card">
+        <div className="flex-1 p-8 flex flex-col bg-white dark:bg-dark-card">
            <div className="flex justify-between items-center mb-6">
               <h3 className="text-xl font-bold text-slate-900 dark:text-white">Project Tasks</h3>
               <button onClick={onClose} className="hidden md:block p-2 rounded-full hover:bg-slate-200 transition-colors">
@@ -186,7 +206,7 @@ const ProjectGridCard: React.FC<{ project: Project; tasks: Task[]; onClick: () =
   return (
     <div 
       onClick={onClick}
-      className={`group bg-slate-200/60 dark:bg-dark-card backdrop-blur-xl p-8 rounded-[2.5rem] border border-white/40 dark:border-dark-border shadow-glass dark:shadow-dark-soft hover:shadow-apple transition-all duration-500 cursor-pointer relative overflow-hidden flex flex-col h-full ${project.status === 'archived' ? 'opacity-40 grayscale-[0.8]' : ''}`}
+      className={`group bg-white dark:bg-dark-card backdrop-blur-xl p-8 rounded-[2.5rem] border border-slate-200 dark:border-dark-border shadow-sm dark:shadow-dark-soft hover:shadow-apple transition-all duration-500 cursor-pointer relative overflow-hidden flex flex-col h-full ${project.status === 'archived' ? 'opacity-40 grayscale-[0.8]' : ''}`}
     >
       <div className="flex justify-between items-start mb-8">
         <div 
@@ -221,13 +241,13 @@ const ProjectGridCard: React.FC<{ project: Project; tasks: Task[]; onClick: () =
           <div className="flex gap-2">
              <button 
               onClick={(e) => quickProgress(e, -10)}
-              className="w-10 h-10 rounded-xl bg-slate-200 dark:bg-white/5 flex items-center justify-center text-slate-400 hover:bg-slate-200 dark:hover:bg-white/10 transition-all opacity-0 group-hover:opacity-100 transform translate-y-2 group-hover:translate-y-0"
+              className="w-10 h-10 rounded-xl bg-slate-50 dark:bg-white/5 flex items-center justify-center text-slate-400 hover:bg-slate-100 dark:hover:bg-white/10 transition-all opacity-0 group-hover:opacity-100 transform translate-y-2 group-hover:translate-y-0"
              >
                 <Minus size={16} />
              </button>
              <button 
               onClick={(e) => quickProgress(e, 10)}
-              className="w-10 h-10 rounded-xl bg-slate-200 dark:bg-white/5 flex items-center justify-center text-slate-400 hover:bg-slate-200 dark:hover:bg-white/10 transition-all opacity-0 group-hover:opacity-100 transform translate-y-2 group-hover:translate-y-0"
+              className="w-10 h-10 rounded-xl bg-slate-50 dark:bg-white/5 flex items-center justify-center text-slate-400 hover:bg-slate-100 dark:hover:bg-white/10 transition-all opacity-0 group-hover:opacity-100 transform translate-y-2 group-hover:translate-y-0"
              >
                 <Plus size={16} />
              </button>
@@ -240,10 +260,12 @@ const ProjectGridCard: React.FC<{ project: Project; tasks: Task[]; onClick: () =
                 <span className="font-display font-bold text-sm" style={{ color: themeColor }}>{project.progress}%</span>
             </div>
             <div className="relative h-3 w-full bg-slate-200 dark:bg-white/5 rounded-full overflow-hidden border border-slate-200/50 dark:border-white/5">
-                <div 
-                    className="absolute inset-y-0 left-0 rounded-full transition-all duration-1000 ease-[cubic-bezier(0.16,1,0.3,1)]"
+                <motion.div 
+                    initial={{ width: 0 }}
+                    animate={{ width: `${project.progress}%` }}
+                    transition={{ duration: 1.5, ease: "easeOut" }}
+                    className="absolute inset-y-0 left-0 rounded-full"
                     style={{ 
-                        width: `${project.progress}%`, 
                         backgroundColor: themeColor,
                         boxShadow: project.progress > 0 ? `0 0 15px ${themeColor}80` : 'none'
                     }}
@@ -300,7 +322,12 @@ export default function ProjectsPage() {
 
       {/* Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-         <div className="bg-slate-200/60 dark:bg-dark-card backdrop-blur-xl p-6 rounded-[2rem] border border-white/40 dark:border-dark-border shadow-glass dark:shadow-dark-soft flex items-center gap-6">
+         <motion.div 
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.1 }}
+            className="bg-white dark:bg-dark-card backdrop-blur-xl p-6 rounded-[2rem] border border-slate-200 dark:border-dark-border shadow-sm dark:shadow-dark-soft flex items-center gap-6"
+         >
             <div className="w-14 h-14 bg-blue-50 dark:bg-blue-500/10 rounded-2xl flex items-center justify-center text-blue-600 dark:text-blue-400">
                <Activity size={24} />
             </div>
@@ -308,8 +335,13 @@ export default function ProjectsPage() {
                <div className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Active Initiatives</div>
                <div className="text-2xl font-bold text-slate-900 dark:text-white">{activeCount}</div>
             </div>
-         </div>
-         <div className="bg-slate-200/60 dark:bg-dark-card backdrop-blur-xl p-6 rounded-[2rem] border border-white/40 dark:border-dark-border shadow-glass dark:shadow-dark-soft flex items-center gap-6">
+         </motion.div>
+         <motion.div 
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.2 }}
+            className="bg-white dark:bg-dark-card backdrop-blur-xl p-6 rounded-[2rem] border border-slate-200 dark:border-dark-border shadow-sm dark:shadow-dark-soft flex items-center gap-6"
+         >
             <div className="w-14 h-14 bg-green-50 dark:bg-green-500/10 rounded-2xl flex items-center justify-center text-green-600 dark:text-green-400">
                <TrendingUp size={24} />
             </div>
@@ -317,8 +349,13 @@ export default function ProjectsPage() {
                <div className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Global Progress</div>
                <div className="text-2xl font-bold text-slate-900 dark:text-white">{avgProgress}%</div>
             </div>
-         </div>
-         <div className="bg-slate-200/60 dark:bg-dark-card backdrop-blur-xl p-6 rounded-[2rem] border border-white/40 dark:border-dark-border shadow-glass dark:shadow-dark-soft flex items-center gap-6">
+         </motion.div>
+         <motion.div 
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.3 }}
+            className="bg-white dark:bg-dark-card backdrop-blur-xl p-6 rounded-[2rem] border border-slate-200 dark:border-dark-border shadow-sm dark:shadow-dark-soft flex items-center gap-6"
+         >
             <div className="w-14 h-14 bg-purple-50 dark:bg-purple-500/10 rounded-2xl flex items-center justify-center text-purple-600 dark:text-purple-400">
                <BarChart3 size={24} />
             </div>
@@ -326,19 +363,19 @@ export default function ProjectsPage() {
                <div className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Total Units</div>
                <div className="text-2xl font-bold text-slate-900 dark:text-white">{projects.length}</div>
             </div>
-         </div>
+         </motion.div>
       </div>
 
       {/* 2. Search & Filters */}
       <div className="flex flex-col md:flex-row gap-4 items-center justify-between">
-         <div className="flex bg-slate-200/40 dark:bg-dark-card/50 backdrop-blur-sm p-1.5 rounded-2xl border border-white/50 dark:border-dark-border shadow-sm w-full md:w-auto overflow-x-auto no-scrollbar">
+         <div className="flex bg-slate-50 dark:bg-dark-card/50 backdrop-blur-sm p-1.5 rounded-2xl border border-slate-200 dark:border-dark-border shadow-sm w-full md:w-auto overflow-x-auto no-scrollbar">
             {['all', 'active', 'completed', 'archived'].map(f => (
                <button
                   key={f}
                   onClick={() => setFilter(f as any)}
                   className={`px-6 py-2 rounded-xl text-xs font-bold uppercase tracking-wider transition-all whitespace-nowrap ${
                      filter === f 
-                        ? 'bg-slate-100 dark:bg-dark-card text-slate-900 dark:text-white shadow-sm' 
+                        ? 'bg-white dark:bg-dark-card text-slate-900 dark:text-white shadow-sm' 
                         : 'text-slate-400 hover:text-slate-600 dark:hover:text-slate-200'
                   }`}
                >
@@ -353,7 +390,7 @@ export default function ProjectsPage() {
                placeholder="Search projects..."
                value={search}
                onChange={(e) => setSearch(e.target.value)}
-               className="w-full h-12 pl-12 pr-4 bg-slate-200/40 dark:bg-dark-card/50 backdrop-blur-sm border border-white/50 dark:border-dark-border rounded-2xl text-sm font-medium focus:outline-none focus:ring-2 focus:ring-blue-500/20 transition-all placeholder:text-slate-400"
+               className="w-full h-12 pl-12 pr-4 bg-white dark:bg-dark-card/50 backdrop-blur-sm border border-slate-200 dark:border-dark-border rounded-2xl text-sm font-medium focus:outline-none focus:ring-2 focus:ring-blue-500/20 transition-all placeholder:text-slate-400"
             />
             <Search size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" />
          </div>
@@ -361,19 +398,32 @@ export default function ProjectsPage() {
 
       {/* 3. Project Grid */}
       {filteredProjects.length > 0 ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <motion.div 
+            layout
+            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
+        >
+          <AnimatePresence mode="popLayout">
           {filteredProjects.map(project => (
-            <ProjectGridCard 
-                key={project.id} 
-                project={project} 
-                tasks={tasks}
-                onClick={() => setSelectedProject(project)}
-            />
+            <motion.div
+                key={project.id}
+                layout
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.9 }}
+                transition={{ duration: 0.3 }}
+            >
+                <ProjectGridCard 
+                    project={project} 
+                    tasks={tasks}
+                    onClick={() => setSelectedProject(project)}
+                />
+            </motion.div>
           ))}
-        </div>
+          </AnimatePresence>
+        </motion.div>
       ) : (
-        <div className="bg-slate-200/40 dark:bg-dark-card/30 backdrop-blur-md rounded-[3rem] p-20 border-2 border-dashed border-white/50 dark:border-dark-border flex flex-col items-center justify-center text-center">
-            <div className="w-20 h-20 bg-slate-200 dark:bg-dark-bg rounded-full flex items-center justify-center text-slate-300 dark:text-slate-700 mb-6">
+        <div className="bg-white dark:bg-dark-card/30 backdrop-blur-md rounded-[3rem] p-20 border-2 border-dashed border-slate-200 dark:border-dark-border flex flex-col items-center justify-center text-center">
+            <div className="w-20 h-20 bg-slate-50 dark:bg-dark-bg rounded-full flex items-center justify-center text-slate-300 dark:text-slate-700 mb-6">
                <Briefcase size={40} />
             </div>
             <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-2">No projects found</h3>

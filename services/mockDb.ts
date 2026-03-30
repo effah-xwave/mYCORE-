@@ -50,7 +50,9 @@ class MockDBService {
       name,
       onboarded: false,
       interests: [],
-      settings: { locationEnabled: false, notificationsEnabled: false, screenTimeEnabled: false }
+      settings: { locationEnabled: false, notificationsEnabled: false, screenTimeEnabled: false },
+      coachName: 'CORE AI Coach',
+      lastCoachRenameDate: new Date(0).toISOString() // Epoch so they can rename immediately
     };
 
     localStorage.setItem('mycore_user', JSON.stringify(newUser));
@@ -87,6 +89,16 @@ class MockDBService {
         this.currentUserCache.settings = settings;
         localStorage.setItem('mycore_user', JSON.stringify(this.currentUserCache));
     }
+  }
+
+  async updateCoachName(newName: string): Promise<void> {
+    const user = await this.getUser();
+    if (!user) return;
+
+    user.coachName = newName;
+    user.lastCoachRenameDate = new Date().toISOString();
+    localStorage.setItem('mycore_user', JSON.stringify(user));
+    this.currentUserCache = user;
   }
 
   // --- HABITS ---
@@ -145,7 +157,6 @@ class MockDBService {
     const allInstances = await this.getAllInstances();
     const habits = await this.getHabits();
     
-    let newInstances: HabitInstance[] = [];
     let hasUpdates = false;
 
     // Check for missing instances and create them (Lazy Load)
@@ -171,6 +182,17 @@ class MockDBService {
     }
 
     return allInstances.filter(i => dates.includes(i.date));
+  }
+
+  async getInstancesForRange(startDate: string, endDate: string): Promise<HabitInstance[]> {
+    const allInstances = await this.getAllInstances();
+    const start = new Date(startDate).getTime();
+    const end = new Date(endDate).getTime();
+
+    return allInstances.filter(i => {
+      const d = new Date(i.date).getTime();
+      return d >= start && d <= end;
+    });
   }
 
   async updateInstanceStatus(instanceId: string, completed: boolean, value?: number): Promise<void> {

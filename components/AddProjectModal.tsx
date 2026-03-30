@@ -49,7 +49,7 @@ export default function AddProjectModal({ onClose }: { onClose: () => void }) {
 
   return (
     <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-950/60 backdrop-blur-md animate-fade-in">
-      <div className="bg-slate-100/90 dark:bg-dark-card/95 backdrop-blur-3xl rounded-[2.5rem] w-full max-w-lg p-8 shadow-2xl border border-slate-300 dark:border-dark-border animate-scale-in flex flex-col gap-6 relative overflow-hidden">
+      <div className="bg-white dark:bg-dark-card backdrop-blur-3xl rounded-[2.5rem] w-full max-w-lg p-8 shadow-2xl border border-slate-200 dark:border-dark-border animate-scale-in flex flex-col gap-6 relative overflow-hidden">
         
         {/* Ambient Glow Background */}
         <div 
@@ -70,7 +70,7 @@ export default function AddProjectModal({ onClose }: { onClose: () => void }) {
                 <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Growth Nexis Global</p>
              </div>
           </div>
-          <button onClick={onClose} className="p-2 rounded-full hover:bg-slate-300 dark:hover:bg-dark-cardHover transition-colors">
+          <button onClick={onClose} className="p-2 rounded-full hover:bg-slate-100 dark:hover:bg-dark-cardHover transition-colors">
             <X className="text-slate-400" size={20} />
           </button>
         </div>
@@ -83,7 +83,7 @@ export default function AddProjectModal({ onClose }: { onClose: () => void }) {
                 <Briefcase size={12} /> Project Name
             </label>
             <input 
-                className={`w-full h-14 px-5 rounded-[1.25rem] bg-slate-200 dark:bg-dark-bg border text-lg font-bold text-slate-900 dark:text-white placeholder:text-slate-300 dark:placeholder:text-slate-700 outline-none transition-all shadow-sm ${error ? 'border-red-400' : 'border-slate-300 dark:border-dark-border focus:ring-4 focus:ring-opacity-10'}`}
+                className={`w-full h-14 px-5 rounded-[1.25rem] bg-slate-50 dark:bg-dark-bg border text-lg font-bold text-slate-900 dark:text-white placeholder:text-slate-300 dark:placeholder:text-slate-700 outline-none transition-all shadow-sm ${error ? 'border-red-400' : 'border-slate-200 dark:border-dark-border focus:ring-4 focus:ring-opacity-10'}`}
                 style={{ 
                     boxShadow: !error ? `0 0 0 4px ${formData.color}05` : undefined,
                     borderColor: !error && formData.name ? formData.color : undefined
@@ -102,7 +102,7 @@ export default function AddProjectModal({ onClose }: { onClose: () => void }) {
                 <AlignLeft size={12} /> Description
             </label>
             <textarea 
-                className="w-full min-h-[80px] p-5 rounded-[1.25rem] bg-slate-200 dark:bg-dark-bg border border-slate-300 dark:border-dark-border text-sm font-medium text-slate-600 dark:text-slate-300 placeholder:text-slate-300 dark:placeholder:text-slate-700 focus:border-opacity-50 outline-none transition-all resize-none shadow-sm"
+                className="w-full min-h-[80px] p-5 rounded-[1.25rem] bg-slate-50 dark:bg-dark-bg border border-slate-200 dark:border-dark-border text-sm font-medium text-slate-600 dark:text-slate-300 placeholder:text-slate-300 dark:placeholder:text-slate-700 focus:border-opacity-50 outline-none transition-all resize-none shadow-sm"
                 placeholder="What are the key outcomes of this initiative?"
                 value={formData.description}
                 onChange={e => setFormData({...formData, description: e.target.value})}
@@ -117,7 +117,7 @@ export default function AddProjectModal({ onClose }: { onClose: () => void }) {
               </label>
               <input 
                 type="date"
-                className="w-full h-12 px-4 rounded-xl bg-slate-200 dark:bg-dark-bg border border-slate-300 dark:border-dark-border text-xs font-bold text-slate-900 dark:text-white focus:outline-none transition-all shadow-sm"
+                className="w-full h-12 px-4 rounded-xl bg-slate-50 dark:bg-dark-bg border border-slate-200 dark:border-dark-border text-xs font-bold text-slate-900 dark:text-white focus:outline-none transition-all shadow-sm"
                 value={formData.startDate}
                 onChange={e => setFormData({...formData, startDate: e.target.value})}
               />
@@ -128,7 +128,7 @@ export default function AddProjectModal({ onClose }: { onClose: () => void }) {
               </label>
               <input 
                 type="date"
-                className="w-full h-12 px-4 rounded-xl bg-slate-200 dark:bg-dark-bg border border-slate-300 dark:border-dark-border text-xs font-bold text-slate-900 dark:text-white focus:outline-none transition-all shadow-sm"
+                className="w-full h-12 px-4 rounded-xl bg-slate-50 dark:bg-dark-bg border border-slate-200 dark:border-dark-border text-xs font-bold text-slate-900 dark:text-white focus:outline-none transition-all shadow-sm"
                 value={formData.endDate}
                 onChange={e => setFormData({...formData, endDate: e.target.value})}
               />
@@ -140,7 +140,7 @@ export default function AddProjectModal({ onClose }: { onClose: () => void }) {
              <label className="flex items-center gap-2 text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest ml-1">
                 <Palette size={12} /> Theme Color
             </label>
-            <div className="flex justify-between p-1 bg-slate-200 dark:bg-dark-bg/50 rounded-2xl border border-slate-300 dark:border-dark-border">
+            <div className="flex justify-between p-1 bg-slate-50 dark:bg-dark-bg/50 rounded-2xl border border-slate-200 dark:border-dark-border">
                 {COLORS.map(color => (
                     <button
                         key={color.hex}

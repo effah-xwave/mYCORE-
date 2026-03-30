@@ -32,13 +32,13 @@ export default function HabitDetailModal({ habit, instances, onClose, onTrigger 
 
   return (
     <div className="fixed inset-0 z-[110] flex items-center justify-center p-4 bg-slate-950/60 backdrop-blur-md animate-fade-in">
-      <div className="bg-slate-100 dark:bg-dark-card w-full max-w-lg rounded-[2.5rem] shadow-2xl border border-slate-300 dark:border-dark-border overflow-hidden animate-scale-in flex flex-col">
+      <div className="bg-white dark:bg-dark-card w-full max-w-lg rounded-[2.5rem] shadow-2xl border border-slate-200 dark:border-dark-border overflow-hidden animate-scale-in flex flex-col">
         
         {/* Header Section */}
         <div className="p-8 pb-0 relative">
           <button 
             onClick={onClose} 
-            className="absolute top-6 right-6 p-2 rounded-full hover:bg-slate-300 dark:hover:bg-dark-cardHover transition-colors z-10"
+            className="absolute top-6 right-6 p-2 rounded-full hover:bg-slate-100 dark:hover:bg-dark-cardHover transition-colors z-10"
           >
             <X size={20} className="text-slate-400" />
           </button>
@@ -69,17 +69,17 @@ export default function HabitDetailModal({ habit, instances, onClose, onTrigger 
           
           {/* Stats Row */}
           <div className="grid grid-cols-3 gap-3">
-            <div className="bg-slate-200 dark:bg-dark-bg/50 p-4 rounded-2xl border border-slate-300 dark:border-dark-border text-center">
+            <div className="bg-slate-50 dark:bg-dark-bg/50 p-4 rounded-2xl border border-slate-200 dark:border-dark-border text-center">
               <div className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Streak</div>
               <div className="text-xl font-bold text-slate-900 dark:text-white flex items-center justify-center gap-1">
                 {habit.streak} <Zap size={14} className="text-yellow-500 fill-current" />
               </div>
             </div>
-            <div className="bg-slate-200 dark:bg-dark-bg/50 p-4 rounded-2xl border border-slate-300 dark:border-dark-border text-center">
+            <div className="bg-slate-50 dark:bg-dark-bg/50 p-4 rounded-2xl border border-slate-200 dark:border-dark-border text-center">
               <div className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">7D Success</div>
               <div className="text-xl font-bold text-slate-900 dark:text-white">{completionRate}%</div>
             </div>
-            <div className="bg-slate-200 dark:bg-dark-bg/50 p-4 rounded-2xl border border-slate-300 dark:border-dark-border text-center">
+            <div className="bg-slate-50 dark:bg-dark-bg/50 p-4 rounded-2xl border border-slate-200 dark:border-dark-border text-center">
               <div className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Trigger</div>
               <div className="text-xs font-bold text-slate-900 dark:text-white mt-1.5">{habit.triggerType.split('_').join(' ')}</div>
             </div>
@@ -108,7 +108,7 @@ export default function HabitDetailModal({ habit, instances, onClose, onTrigger 
           )}
 
           {/* Trigger Detail */}
-          <div className="p-5 rounded-[1.5rem] bg-slate-200 dark:bg-dark-bg/50 border border-slate-300 dark:border-dark-border">
+          <div className="p-5 rounded-[1.5rem] bg-slate-50 dark:bg-dark-bg/50 border border-slate-200 dark:border-dark-border">
             <div className="flex items-center gap-2 mb-3">
               <Info size={18} className="text-slate-400" />
               <h4 className="text-sm font-bold text-slate-900 dark:text-white">Automation Info</h4>
@@ -158,7 +158,7 @@ export default function HabitDetailModal({ habit, instances, onClose, onTrigger 
             </div>
             <div className="flex justify-between px-2">
                {historyData.map((d, i) => (
-                 <div key={i} className={`w-6 h-6 rounded-lg flex items-center justify-center text-[8px] font-bold border transition-colors ${d.status === 1 ? 'bg-green-500 border-green-500 text-white' : 'bg-slate-300 dark:bg-dark-bg text-slate-400 border-slate-400 dark:border-dark-border'}`}>
+                 <div key={i} className={`w-6 h-6 rounded-lg flex items-center justify-center text-[8px] font-bold border transition-colors ${d.status === 1 ? 'bg-green-500 border-green-500 text-white' : 'bg-slate-100 dark:bg-dark-bg text-slate-400 border-slate-200 dark:border-dark-border'}`}>
                     {d.name.charAt(0)}
                  </div>
                ))}

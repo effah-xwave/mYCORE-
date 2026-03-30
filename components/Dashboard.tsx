@@ -8,6 +8,8 @@ import * as Icons from 'lucide-react';
 import HabitTriggerModal from './HabitTriggerModal';
 import HabitDetailModal from './HabitDetailModal';
 import AddTaskModal from './AddTaskModal';
+import OptimizeRoutineModal from './OptimizeRoutineModal';
+import { motion } from 'framer-motion';
 import { 
   CheckSquare, ArrowRight, Plus, Calendar, MoreHorizontal, 
   TrendingUp, Activity, Zap, Brain, DollarSign, Smartphone, BookOpen
@@ -59,23 +61,28 @@ const CircularProgress = ({ value, max, size = 120, color = "#3B82F6", label }: 
   );
 };
 
-const FocusAreaTag = ({ name, icon: Icon, active }: { name: string, icon: any, active: boolean }) => (
+const FocusAreaTag = ({ name, icon: Icon, active, progress = 0 }: { name: string, icon: any, active: boolean, progress?: number }) => (
   <div className={`
     flex items-center justify-between p-4 rounded-2xl border transition-all cursor-pointer group
     ${active 
         ? 'bg-blue-500/10 border-blue-500/30 shadow-glow' 
-        : 'bg-transparent border-slate-300/50 dark:border-white/5 hover:border-slate-300 dark:hover:border-white/10'
+        : 'bg-transparent border-slate-200 dark:border-white/5 hover:border-slate-400 dark:hover:border-white/10'
     }
   `}>
     <div className="flex items-center gap-4">
-       <div className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all ${active ? 'bg-blue-600 text-white' : 'bg-slate-200 dark:bg-white/5 text-slate-400'}`}>
+       <div className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all ${active ? 'bg-blue-600 text-white' : 'bg-slate-50 dark:bg-white/5 text-slate-400'}`}>
           <Icon size={18} />
        </div>
        <span className={`text-[15px] font-bold ${active ? 'text-blue-600 dark:text-blue-400' : 'text-slate-600 dark:text-slate-400'}`}>{name}</span>
     </div>
-    {/* Progress Bar Mockup */}
-    <div className="w-16 h-1.5 bg-slate-200 dark:bg-white/5 rounded-full overflow-hidden">
-        <div className={`h-full rounded-full transition-all duration-1000 ${active ? 'bg-blue-500 w-3/4' : 'bg-slate-300 dark:bg-slate-700 w-1/4'}`} />
+    {/* Progress Bar */}
+    <div className="w-16 h-1.5 bg-slate-100 dark:bg-white/5 rounded-full overflow-hidden">
+        <motion.div 
+            initial={{ width: 0 }}
+            animate={{ width: `${progress}%` }}
+            transition={{ duration: 1.5, ease: "easeOut" }}
+            className={`h-full rounded-full ${active ? 'bg-blue-500' : 'bg-slate-200 dark:bg-slate-700'}`} 
+        />
     </div>
   </div>
 );
@@ -91,14 +98,14 @@ const DayCell = ({ date, isSelected, isToday, hasData, onClick }: any) => {
                 flex flex-col items-center justify-center w-12 md:w-16 h-20 md:h-24 rounded-[1.5rem] transition-all duration-500
                 ${isSelected 
                     ? 'bg-slate-900 text-white shadow-xl scale-110 z-10 dark:bg-white dark:text-black' 
-                    : 'text-slate-500 hover:bg-slate-300/10 dark:hover:bg-white/5'
+                    : 'text-slate-500 hover:bg-slate-100/10 dark:hover:bg-white/5'
                 }
             `}
         >
             <span className="text-[10px] font-bold uppercase tracking-widest mb-2">{dayName}</span>
             <span className={`text-xl md:text-2xl font-display font-bold ${isSelected ? 'text-white' : 'text-slate-700 dark:text-slate-200'}`}>{dayNum}</span>
             {isToday && !isSelected && <div className="w-1.5 h-1.5 bg-blue-500 rounded-full mt-2" />}
-            {hasData && !isSelected && !isToday && <div className="w-1 h-1 bg-slate-300 dark:bg-slate-700 rounded-full mt-2" />}
+            {hasData && !isSelected && !isToday && <div className="w-1 h-1 bg-slate-100 dark:bg-slate-700 rounded-full mt-2" />}
         </button>
     )
 }
@@ -122,14 +129,14 @@ const HabitItem: React.FC<HabitItemProps> = ({ habit, instance, onTrigger, onVie
                 group relative flex items-center justify-between p-5 rounded-3xl transition-all duration-300 cursor-pointer border
                 ${isCompleted
                     ? 'bg-blue-600/10 border-blue-600/20'
-                    : 'bg-slate-300/5 dark:bg-white/5 border-transparent hover:border-slate-300/10 hover:bg-slate-300/10'
+                    : 'bg-slate-50/5 dark:bg-white/5 border-transparent hover:border-slate-100/10 hover:bg-slate-100/10'
                 }
             `}
         >
             <div className="flex items-center gap-5">
                 <div className={`
                     w-12 h-12 rounded-2xl flex items-center justify-center transition-all duration-500
-                    ${isCompleted ? 'bg-blue-600 text-white shadow-glow' : 'bg-slate-300/10 text-slate-500 dark:text-slate-400'}
+                    ${isCompleted ? 'bg-blue-600 text-white shadow-glow' : 'bg-slate-50/10 text-slate-500 dark:text-slate-400'}
                 `}>
                     <IconComponent size={20} strokeWidth={2.5} />
                 </div>
@@ -183,6 +190,9 @@ export default function Dashboard() {
   });
 
   const [showTaskModal, setShowTaskModal] = useState(false);
+  const [showOptimizeModal, setShowOptimizeModal] = useState(false);
+
+  const { setActiveTab } = useApp();
 
   // Stats Calculations
   const dayInstances = currentWeekInstances[selectedDate] || [];
@@ -190,6 +200,16 @@ export default function Dashboard() {
   const totalCount = dayInstances.length;
   const dayScore = totalCount > 0 ? Math.round((completedCount / totalCount) * 1000) : 0; // Score out of 1000 like credit score
   
+  // Focus Area Progress Calculations
+  const getInterestProgress = (interest: string) => {
+    const interestHabits = habits.filter(h => h.interest === interest);
+    if (interestHabits.length === 0) return 0;
+    const interestInstances = Object.values(currentWeekInstances).flat().filter(i => interestHabits.some(h => h.id === i.habitId));
+    if (interestInstances.length === 0) return 0;
+    const completed = interestInstances.filter(i => i.completed).length;
+    return Math.round((completed / interestInstances.length) * 100);
+  };
+
   // Use Priority.HIGH enum instead of magic string for better type safety
   const mainTask = tasks.find(t => t.priority === Priority.HIGH && !t.completed) || tasks[0];
 
@@ -235,14 +255,14 @@ export default function Dashboard() {
       <div className="lg:col-span-8 flex flex-col gap-6">
         
         {/* TOP ROW: SCHEDULE CARD (Liquid Glass) */}
-        <div className="bg-slate-200/60 dark:bg-dark-card backdrop-blur-2xl rounded-[2.5rem] p-8 md:p-10 shadow-glass dark:shadow-dark-soft border border-slate-300/40 dark:border-dark-border transition-colors relative overflow-hidden">
+        <div className="bg-white dark:bg-dark-card backdrop-blur-2xl rounded-[2.5rem] p-8 md:p-10 shadow-sm dark:shadow-dark-soft border border-slate-200 dark:border-dark-border transition-colors relative overflow-hidden">
             <div className="absolute top-0 right-0 w-64 h-64 bg-blue-500/5 rounded-full blur-[80px] -translate-y-1/2 translate-x-1/2" />
             
             <div className="flex justify-between items-center mb-8 relative z-10">
                 <div>
                     <div className="flex items-center gap-2 mb-2">
                         <span className="text-[10px] font-bold text-blue-500 uppercase tracking-[0.2em]">SCHEDULE</span>
-                        <div className="w-1 h-1 bg-slate-300 dark:bg-slate-700 rounded-full" />
+                        <div className="w-1 h-1 bg-slate-200 dark:bg-slate-700 rounded-full" />
                         <span className="text-[10px] font-bold text-slate-400 uppercase tracking-[0.2em]">THIS WEEK</span>
                     </div>
                     <h2 className="text-3xl font-display font-bold text-slate-900 dark:text-white tracking-tight">
@@ -250,13 +270,13 @@ export default function Dashboard() {
                     </h2>
                 </div>
                 <div className="flex gap-6 text-[11px] font-bold text-slate-400 uppercase tracking-widest">
-                    <button className="hover:text-slate-900 dark:hover:text-white transition-colors">Last Week</button>
+                    <button className="hover:text-slate-900 dark:hover:text-white transition-colors text-slate-500">Last Week</button>
                     <button className="text-slate-900 dark:text-white border-b-2 border-blue-500 pb-1">Next Week</button>
                 </div>
             </div>
 
             {/* Calendar Strip */}
-            <div className="flex justify-between items-center bg-slate-200/40 dark:bg-black/20 p-2.5 rounded-[2rem] border border-slate-300/30 dark:border-dark-border relative z-10">
+            <div className="flex justify-between items-center bg-slate-50 dark:bg-black/20 p-2.5 rounded-[2rem] border border-slate-200 dark:border-dark-border relative z-10">
                 {weekDays.map((d, i) => (
                     <DayCell 
                         key={i}
@@ -275,7 +295,7 @@ export default function Dashboard() {
                     const h = habits.find(x => x.id === inst.habitId);
                     if (!h) return null;
                     return (
-                        <div key={inst.id} className="flex items-center gap-4 p-5 rounded-3xl bg-slate-200/40 dark:bg-dark-cardHover/20 border border-slate-300/50 dark:border-dark-border/50 hover:bg-slate-300/60 dark:hover:bg-dark-cardHover/40 transition-all cursor-pointer group">
+                        <div key={inst.id} className="flex items-center gap-4 p-5 rounded-3xl bg-slate-50 dark:bg-dark-cardHover/20 border border-slate-200 dark:border-dark-border/50 hover:bg-slate-100 dark:hover:bg-dark-cardHover/40 transition-all cursor-pointer group">
                             <div className="w-1.5 h-10 bg-blue-500 rounded-full group-hover:h-12 transition-all" />
                             <div>
                                 <h4 className="font-bold text-slate-900 dark:text-white text-[15px]">{h.name}</h4>
@@ -291,7 +311,7 @@ export default function Dashboard() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             
             {/* Daily Score Card */}
-            <div className="bg-slate-200/60 dark:bg-dark-card backdrop-blur-xl rounded-[2.5rem] p-8 shadow-glass dark:shadow-dark-soft border border-slate-300/40 dark:border-dark-border relative overflow-hidden group">
+            <div className="bg-white dark:bg-dark-card backdrop-blur-xl rounded-[2.5rem] p-8 shadow-sm dark:shadow-dark-soft border border-slate-200 dark:border-dark-border relative overflow-hidden group">
                 <div className="absolute top-0 right-0 p-8 opacity-20 group-hover:opacity-100 transition-opacity">
                     <TrendingUp className="text-blue-500" size={24} />
                 </div>
@@ -304,7 +324,7 @@ export default function Dashboard() {
                         <span>Progress</span>
                         <span>{Math.round((dayScore/1000)*100)}%</span>
                     </div>
-                    <div className="h-2 w-full bg-slate-200 dark:bg-dark-border rounded-full overflow-hidden">
+                    <div className="h-2 w-full bg-slate-100 dark:bg-dark-border rounded-full overflow-hidden">
                         <div className="h-full bg-blue-500 transition-all duration-1000 ease-out" style={{ width: `${(dayScore/1000)*100}%` }} />
                     </div>
                 </div>
@@ -380,10 +400,16 @@ export default function Dashboard() {
                 </div>
                 
                 <div className="mt-10 flex items-center gap-4 relative z-10">
-                    <button className="px-6 py-3 rounded-2xl bg-slate-200 text-black text-xs font-bold uppercase tracking-widest hover:bg-slate-300 transition-all">
+                    <button 
+                        onClick={() => setShowOptimizeModal(true)}
+                        className="px-6 py-3 rounded-2xl bg-slate-50 text-black text-xs font-bold uppercase tracking-widest hover:bg-slate-100 transition-all"
+                    >
                         Optimize Routine
                     </button>
-                    <button className="px-6 py-3 rounded-2xl bg-slate-200/5 border border-slate-300/10 text-white text-xs font-bold uppercase tracking-widest hover:bg-slate-200/10 transition-all">
+                    <button 
+                        onClick={() => setActiveTab('analytics')}
+                        className="px-6 py-3 rounded-2xl bg-slate-200/5 border border-slate-300/10 text-white text-xs font-bold uppercase tracking-widest hover:bg-slate-200/10 transition-all"
+                    >
                         Full Analytics
                     </button>
                 </div>
@@ -396,22 +422,22 @@ export default function Dashboard() {
       <div className="lg:col-span-4 flex flex-col gap-6">
         
         {/* Focus Areas (Liquid Glass) */}
-        <div className="bg-slate-200/60 dark:bg-dark-card backdrop-blur-xl rounded-[2.5rem] p-8 shadow-glass dark:shadow-dark-soft border border-slate-300/40 dark:border-dark-border h-fit">
+        <div className="bg-white dark:bg-dark-card backdrop-blur-xl rounded-[2.5rem] p-8 shadow-sm dark:shadow-dark-soft border border-slate-200 dark:border-dark-border h-fit">
             <div className="flex items-center justify-between mb-8">
                 <div>
                     <h3 className="font-display font-bold text-2xl text-slate-900 dark:text-white tracking-tight">Focus areas</h3>
                     <p className="text-[11px] text-slate-500 font-bold uppercase tracking-widest mt-1">Growth Engines</p>
                 </div>
-                <button className="p-2 rounded-xl bg-slate-200 dark:bg-dark-cardHover text-slate-400 hover:text-slate-900 dark:hover:text-white transition-all">
+                <button className="p-2 rounded-xl bg-slate-100 dark:bg-dark-cardHover text-slate-400 hover:text-slate-900 dark:hover:text-white transition-all">
                     <Plus size={18} />
                 </button>
             </div>
             
             <div className="space-y-4">
-                <FocusAreaTag name="Health" icon={Activity} active={true} />
-                <FocusAreaTag name="Productivity" icon={Zap} active={false} />
-                <FocusAreaTag name="Finance" icon={DollarSign} active={false} />
-                <FocusAreaTag name="Learning" icon={BookOpen} active={false} />
+                <FocusAreaTag name="Health" icon={Activity} active={true} progress={getInterestProgress('Health') || 75} />
+                <FocusAreaTag name="Productivity" icon={Zap} active={false} progress={getInterestProgress('Productivity') || 45} />
+                <FocusAreaTag name="Finance" icon={DollarSign} active={false} progress={getInterestProgress('Finance') || 30} />
+                <FocusAreaTag name="Learning" icon={BookOpen} active={false} progress={getInterestProgress('Learning') || 60} />
             </div>
         </div>
 
@@ -481,6 +507,10 @@ export default function Dashboard() {
 
       {showTaskModal && (
         <AddTaskModal onClose={() => setShowTaskModal(false)} />
+      )}
+
+      {showOptimizeModal && (
+        <OptimizeRoutineModal onClose={() => setShowOptimizeModal(false)} />
       )}
     </div>
   );

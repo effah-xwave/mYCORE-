@@ -128,42 +128,42 @@ export default function Onboarding() {
   const CustomIconComponent = CUSTOM_ICONS.find(c => c.id === customIcon)?.Icon || Activity;
 
   return (
-    <div className="min-h-screen bg-[#F8F9FA] flex flex-col items-center justify-center p-6 relative overflow-hidden isolate">
+    <div className="min-h-screen bg-slate-50 dark:bg-dark-bg flex flex-col items-center justify-center p-6 relative overflow-hidden isolate transition-colors duration-500">
       {/* Background Decor - Animated */}
       <div className="absolute inset-0 z-0 pointer-events-none overflow-hidden">
-          <div className="absolute top-[-15%] right-[-15%] w-[60vw] h-[60vw] bg-blue-300/30 rounded-full blur-[100px] mix-blend-multiply opacity-80 animate-blob" />
-          <div className="absolute bottom-[-15%] left-[-15%] w-[60vw] h-[60vw] bg-indigo-300/30 rounded-full blur-[100px] mix-blend-multiply opacity-80 animate-blob animation-delay-2000" />
-          <div className="absolute top-[40%] left-[60%] w-[40vw] h-[40vw] bg-purple-200/30 rounded-full blur-[80px] mix-blend-multiply opacity-60 animate-blob animation-delay-4000" />
-          <div className="absolute inset-0 bg-white/40 backdrop-blur-3xl"></div>
+          <div className="absolute top-[-15%] right-[-15%] w-[60vw] h-[60vw] bg-blue-300/30 dark:bg-blue-900/20 rounded-full blur-[100px] mix-blend-multiply dark:mix-blend-screen opacity-80 animate-blob" />
+          <div className="absolute bottom-[-15%] left-[-15%] w-[60vw] h-[60vw] bg-indigo-300/30 dark:bg-indigo-900/20 rounded-full blur-[100px] mix-blend-multiply dark:mix-blend-screen opacity-80 animate-blob animation-delay-2000" />
+          <div className="absolute top-[40%] left-[60%] w-[40vw] h-[40vw] bg-purple-200/30 dark:bg-purple-900/20 rounded-full blur-[80px] mix-blend-multiply dark:mix-blend-screen opacity-60 animate-blob animation-delay-4000" />
+          <div className="absolute inset-0 bg-white/40 dark:bg-black/20 backdrop-blur-3xl"></div>
       </div>
 
-      <div className="max-w-xl w-full bg-white/70 backdrop-blur-xl rounded-[2.5rem] shadow-apple border border-white/60 p-8 md:p-12 z-10 transition-all duration-700 max-h-[90vh] overflow-y-auto no-scrollbar">
+      <div className="max-w-xl w-full bg-white/70 dark:bg-dark-card/70 backdrop-blur-xl rounded-[2.5rem] shadow-apple border border-white/60 dark:border-white/10 p-8 md:p-12 z-10 transition-all duration-700 max-h-[90vh] overflow-y-auto no-scrollbar">
         
         {/* STEP 1: WELCOME */}
         {step === 1 && (
           <div className="text-center space-y-8 animate-fade-in">
              <div className="flex justify-center mb-4">
-                <div className="w-24 h-24 bg-white rounded-[2rem] shadow-apple flex items-center justify-center p-4">
+                <div className="w-24 h-24 bg-white dark:bg-dark-card rounded-[2rem] shadow-apple border border-slate-100 dark:border-dark-border flex items-center justify-center p-4">
                     <img 
                       src="/logo.png" 
                       alt="GNG" 
                       className="w-full h-full object-contain"
                       onError={(e) => { e.currentTarget.style.display = 'none'; e.currentTarget.nextElementSibling?.classList.remove('hidden'); }}
                     />
-                     <span className="hidden text-3xl font-bold text-navy-900">GN</span>
+                     <span className="hidden text-3xl font-bold text-slate-900 dark:text-white">GN</span>
                 </div>
             </div>
             
             <div>
-                <h1 className="text-3xl font-bold text-navy-900 tracking-tight">Welcome, {user?.name.split(' ')[0]}</h1>
-                <p className="text-slate-500 text-lg mt-3 leading-relaxed">
+                <h1 className="text-3xl font-bold text-slate-900 dark:text-white tracking-tight">Welcome, {user?.name.split(' ')[0]}</h1>
+                <p className="text-slate-500 dark:text-slate-400 text-lg mt-3 leading-relaxed">
                 Let's design a routine that unlocks your <br/> limitless potential.
                 </p>
             </div>
 
             <button 
               onClick={() => setStep(2)}
-              className="w-full h-14 bg-navy-900 text-white rounded-2xl font-semibold text-lg hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center justify-center gap-3 shadow-lg shadow-navy-900/20"
+              className="w-full h-14 bg-slate-900 dark:bg-blue-600 text-white rounded-2xl font-semibold text-lg hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center justify-center gap-3 shadow-lg shadow-slate-900/20 dark:shadow-blue-600/20"
             >
               Start Design <ArrowRight size={20} />
             </button>
@@ -174,8 +174,8 @@ export default function Onboarding() {
         {step === 2 && (
           <div className="space-y-8 animate-scale-in">
             <div className="text-center">
-              <h2 className="text-2xl font-bold text-navy-900 tracking-tight">Focus Areas</h2>
-              <p className="text-slate-500 mt-2">What do you want to master?</p>
+              <h2 className="text-2xl font-bold text-slate-900 dark:text-white tracking-tight">Focus Areas</h2>
+              <p className="text-slate-500 dark:text-slate-400 mt-2">What do you want to master?</p>
             </div>
             
             <div className="grid grid-cols-2 gap-4">
@@ -188,12 +188,12 @@ export default function Onboarding() {
                     className={`
                       p-5 rounded-3xl border-2 transition-all duration-300 flex flex-col items-center gap-3
                       ${isSelected 
-                        ? 'border-navy-900 bg-navy-900 text-white shadow-lg transform scale-[1.02]' 
-                        : 'border-transparent bg-white/80 text-slate-400 hover:bg-white hover:shadow-sm'
+                        ? 'border-slate-900 dark:border-blue-500 bg-slate-900 dark:bg-blue-600 text-white shadow-lg transform scale-[1.02]' 
+                        : 'border-transparent bg-white/80 dark:bg-dark-bg/50 text-slate-400 hover:bg-white dark:hover:bg-dark-bg hover:shadow-sm'
                       }
                     `}
                   >
-                    <item.icon size={28} className={isSelected ? 'text-white' : 'text-slate-300'} strokeWidth={isSelected ? 2.5 : 2} />
+                    <item.icon size={28} className={isSelected ? 'text-white' : 'text-slate-300 dark:text-slate-600'} strokeWidth={isSelected ? 2.5 : 2} />
                     <span className="text-sm font-semibold tracking-wide">{item.label}</span>
                   </button>
                 )
@@ -202,26 +202,26 @@ export default function Onboarding() {
               {!isAddingInterest ? (
                   <button 
                     onClick={() => setIsAddingInterest(true)}
-                    className="p-5 rounded-3xl border-2 border-dashed border-slate-300 text-slate-400 hover:border-navy-300 hover:text-navy-900 transition-all flex flex-col items-center justify-center gap-3 group"
+                    className="p-5 rounded-3xl border-2 border-dashed border-slate-300 dark:border-dark-border text-slate-400 hover:border-slate-900 dark:hover:border-blue-500 hover:text-slate-900 dark:hover:text-white transition-all flex flex-col items-center justify-center gap-3 group"
                   >
-                    <div className="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center group-hover:bg-navy-900 group-hover:text-white transition-colors">
+                    <div className="w-8 h-8 rounded-full bg-slate-100 dark:bg-dark-bg flex items-center justify-center group-hover:bg-slate-900 dark:group-hover:bg-blue-600 group-hover:text-white transition-colors">
                         <Plus size={18} />
                     </div>
                     <span className="text-sm font-semibold">Custom</span>
                   </button>
               ) : (
-                  <div className="col-span-1 p-4 rounded-3xl bg-white shadow-lg flex flex-col justify-between animate-fade-in">
+                  <div className="col-span-1 p-4 rounded-3xl bg-white dark:bg-dark-card shadow-lg flex flex-col justify-between animate-fade-in border border-slate-100 dark:border-dark-border">
                      <input 
                         autoFocus
                         value={newInterestName}
                         onChange={(e) => setNewInterestName(e.target.value)}
                         placeholder="Name..."
-                        className="w-full text-sm p-2 outline-none border-b border-slate-100 font-semibold text-navy-900 mb-2"
+                        className="w-full text-sm p-2 outline-none border-b border-slate-100 dark:border-dark-border font-semibold text-slate-900 dark:text-white bg-transparent mb-2"
                         onKeyDown={(e) => e.key === 'Enter' && addNewInterest()}
                      />
                      <div className="flex gap-2">
-                         <button onClick={addNewInterest} className="flex-1 bg-navy-900 text-white text-xs py-2 rounded-xl font-bold">Add</button>
-                         <button onClick={() => setIsAddingInterest(false)} className="px-3 bg-slate-100 text-slate-400 rounded-xl hover:bg-slate-200"><X size={14}/></button>
+                         <button onClick={addNewInterest} className="flex-1 bg-slate-900 dark:bg-blue-600 text-white text-xs py-2 rounded-xl font-bold">Add</button>
+                         <button onClick={() => setIsAddingInterest(false)} className="px-3 bg-slate-100 dark:bg-dark-bg text-slate-400 rounded-xl hover:bg-slate-200 dark:hover:bg-dark-cardHover"><X size={14}/></button>
                      </div>
                   </div>
               )}
@@ -230,7 +230,7 @@ export default function Onboarding() {
             <button 
               onClick={() => setStep(3)}
               disabled={selectedInterests.length === 0}
-              className="w-full h-14 bg-navy-900 disabled:opacity-50 text-white rounded-2xl font-semibold text-lg hover:scale-[1.02] active:scale-[0.98] transition-all shadow-lg"
+              className="w-full h-14 bg-slate-900 dark:bg-blue-600 disabled:opacity-50 text-white rounded-2xl font-semibold text-lg hover:scale-[1.02] active:scale-[0.98] transition-all shadow-lg"
             >
               Continue
             </button>
@@ -241,15 +241,15 @@ export default function Onboarding() {
         {step === 3 && (
             <div className="space-y-6 animate-scale-in">
                 <div className="text-center mb-6">
-                    <h2 className="text-2xl font-bold text-navy-900 tracking-tight">Your Core Routine</h2>
-                    <p className="text-slate-500 mt-2">Tailored to your focus areas.</p>
+                    <h2 className="text-2xl font-bold text-slate-900 dark:text-white tracking-tight">Your Core Routine</h2>
+                    <p className="text-slate-500 dark:text-slate-400 mt-2">Tailored to your focus areas.</p>
                 </div>
 
                 <div className="space-y-3 max-h-[400px] overflow-y-auto pr-2 custom-scrollbar">
                     {finalHabits.map((h) => (
-                        <div key={h.id} className="flex items-center justify-between p-4 bg-white/80 rounded-2xl shadow-sm border border-transparent hover:border-slate-100 transition-all group">
+                        <div key={h.id} className="flex items-center justify-between p-4 bg-white/80 dark:bg-dark-bg/50 rounded-2xl shadow-sm border border-transparent dark:border-dark-border hover:border-slate-100 dark:hover:border-slate-700 transition-all group">
                             <div className="flex items-center gap-4">
-                                <div className="w-12 h-12 bg-slate-50 rounded-xl flex items-center justify-center text-navy-900">
+                                <div className="w-12 h-12 bg-slate-50 dark:bg-dark-card rounded-xl flex items-center justify-center text-slate-900 dark:text-white">
                                      {(() => {
                                         const found = CUSTOM_ICONS.find(c => c.id === h.icon);
                                         const Icon = found ? found.Icon : Activity;
@@ -257,18 +257,18 @@ export default function Onboarding() {
                                      })()}
                                 </div>
                                 <div>
-                                    <h4 className="font-bold text-navy-900 text-sm">{h.name}</h4>
+                                    <h4 className="font-bold text-slate-900 dark:text-white text-sm">{h.name}</h4>
                                     <div className="flex items-center gap-2">
                                         <p className="text-xs text-slate-400 font-medium mt-0.5">{h.schedule} • {h.interest}</p>
                                         {h.goal && (
-                                            <span className="text-[10px] bg-blue-50 text-blue-600 px-1.5 py-0.5 rounded font-bold">
+                                            <span className="text-[10px] bg-blue-50 dark:bg-blue-500/10 text-blue-600 dark:text-blue-400 px-1.5 py-0.5 rounded font-bold">
                                                 Goal: {h.goal.target} {h.goal.unit}
                                             </span>
                                         )}
                                     </div>
                                 </div>
                             </div>
-                            <button onClick={() => removeHabit(h.id)} className="w-8 h-8 rounded-full hover:bg-red-50 text-slate-300 hover:text-red-500 flex items-center justify-center transition-colors">
+                            <button onClick={() => removeHabit(h.id)} className="w-8 h-8 rounded-full hover:bg-red-50 dark:hover:bg-red-900/20 text-slate-300 hover:text-red-500 flex items-center justify-center transition-colors">
                                 <X size={18} />
                             </button>
                         </div>
@@ -278,21 +278,21 @@ export default function Onboarding() {
                 {!isAddingCustom ? (
                     <button 
                         onClick={() => setIsAddingCustom(true)}
-                        className="w-full py-4 border-2 border-dashed border-slate-300 rounded-2xl text-slate-400 font-semibold hover:border-navy-900 hover:text-navy-900 transition-all flex items-center justify-center gap-2"
+                        className="w-full py-4 border-2 border-dashed border-slate-300 dark:border-dark-border rounded-2xl text-slate-400 font-semibold hover:border-slate-900 dark:hover:border-blue-500 hover:text-slate-900 dark:hover:text-white transition-all flex items-center justify-center gap-2"
                     >
                         <Plus size={20} /> Add Custom Habit
                     </button>
                 ) : (
-                    <div className="bg-white p-5 rounded-[1.5rem] shadow-apple animate-fade-in-up space-y-4">
+                    <div className="bg-white dark:bg-dark-card p-5 rounded-[1.5rem] shadow-apple border border-slate-100 dark:border-dark-border animate-fade-in-up space-y-4">
                         <div className="flex justify-between items-center">
-                            <h4 className="font-bold text-navy-900">New Habit</h4>
-                            <button onClick={() => setIsAddingCustom(false)} className="bg-slate-100 p-1.5 rounded-full"><X size={14}/></button>
+                            <h4 className="font-bold text-slate-900 dark:text-white">New Habit</h4>
+                            <button onClick={() => setIsAddingCustom(false)} className="bg-slate-100 dark:bg-dark-bg p-1.5 rounded-full"><X size={14}/></button>
                         </div>
                         
                         <input 
                             value={customName}
                             onChange={(e) => setCustomName(e.target.value)}
-                            className="w-full h-10 px-3 rounded-xl bg-slate-50 text-sm font-medium focus:ring-2 focus:ring-navy-900 outline-none"
+                            className="w-full h-10 px-3 rounded-xl bg-slate-50 dark:bg-dark-bg text-sm font-medium focus:ring-2 focus:ring-slate-900 dark:focus:ring-blue-500 outline-none text-slate-900 dark:text-white"
                             placeholder="Habit Name (e.g. Drink Water)"
                         />
 
@@ -300,7 +300,7 @@ export default function Onboarding() {
                              <select 
                                 value={customInterest}
                                 onChange={(e) => setCustomInterest(e.target.value as InterestType)}
-                                className="h-10 px-2 rounded-xl bg-slate-50 text-xs font-medium outline-none"
+                                className="h-10 px-2 rounded-xl bg-slate-50 dark:bg-dark-bg text-xs font-medium outline-none text-slate-900 dark:text-white"
                              >
                                 {DEFAULT_INTERESTS.map(i => <option key={i.id} value={i.id}>{i.label}</option>)}
                                 {availableInterests.filter(i => !DEFAULT_INTERESTS.some(d => d.id === i.id)).map(i => <option key={i.id} value={i.id}>{i.label}</option>)}
@@ -308,23 +308,23 @@ export default function Onboarding() {
                              <select 
                                 value={customSchedule}
                                 onChange={(e) => setCustomSchedule(e.target.value as ScheduleType)}
-                                className="h-10 px-2 rounded-xl bg-slate-50 text-xs font-medium outline-none"
+                                className="h-10 px-2 rounded-xl bg-slate-50 dark:bg-dark-bg text-xs font-medium outline-none text-slate-900 dark:text-white"
                              >
                                 {Object.values(ScheduleType).map(t => <option key={t} value={t}>{t}</option>)}
                              </select>
                         </div>
 
                         {/* Goal Toggle */}
-                        <div className="bg-slate-50 p-3 rounded-xl">
+                        <div className="bg-slate-50 dark:bg-dark-bg/50 p-3 rounded-xl border border-slate-100 dark:border-dark-border">
                             <div className="flex items-center justify-between mb-2">
-                                <label className="flex items-center gap-2 text-xs font-bold text-slate-500 uppercase">
+                                <label className="flex items-center gap-2 text-xs font-bold text-slate-500 dark:text-slate-400 uppercase">
                                     <Target size={14} /> Set a Goal?
                                 </label>
                                 <input 
                                     type="checkbox" 
                                     checked={hasGoal} 
                                     onChange={(e) => setHasGoal(e.target.checked)} 
-                                    className="w-4 h-4 rounded text-navy-900 focus:ring-navy-900"
+                                    className="w-4 h-4 rounded text-slate-900 dark:text-blue-600 focus:ring-slate-900 dark:focus:ring-blue-500"
                                 />
                             </div>
                             
@@ -335,14 +335,14 @@ export default function Onboarding() {
                                         value={goalTarget}
                                         onChange={(e) => setGoalTarget(e.target.value)}
                                         placeholder="Target (e.g. 5)"
-                                        className="h-9 px-2 rounded-lg bg-white border border-slate-200 text-sm focus:border-navy-900 outline-none"
+                                        className="h-9 px-2 rounded-lg bg-white dark:bg-dark-bg border border-slate-200 dark:border-dark-border text-sm focus:border-slate-900 dark:focus:border-blue-500 outline-none text-slate-900 dark:text-white"
                                     />
                                     <input 
                                         type="text"
                                         value={goalUnit}
                                         onChange={(e) => setGoalUnit(e.target.value)}
                                         placeholder="Unit (e.g. km)"
-                                        className="h-9 px-2 rounded-lg bg-white border border-slate-200 text-sm focus:border-navy-900 outline-none"
+                                        className="h-9 px-2 rounded-lg bg-white dark:bg-dark-bg border border-slate-200 dark:border-dark-border text-sm focus:border-slate-900 dark:focus:border-blue-500 outline-none text-slate-900 dark:text-white"
                                     />
                                 </div>
                             )}
@@ -350,7 +350,7 @@ export default function Onboarding() {
 
                         <button 
                             onClick={saveCustomHabit}
-                            className="w-full bg-navy-900 text-white h-10 rounded-xl text-sm font-bold"
+                            className="w-full bg-slate-900 dark:bg-blue-600 text-white h-10 rounded-xl text-sm font-bold shadow-lg"
                         >
                             Save
                         </button>
@@ -360,7 +360,7 @@ export default function Onboarding() {
                 <button 
                     onClick={() => setStep(4)}
                     disabled={finalHabits.length === 0}
-                    className="w-full h-14 bg-navy-900 disabled:opacity-50 text-white rounded-2xl font-semibold text-lg hover:scale-[1.02] active:scale-[0.98] transition-all shadow-lg mt-4"
+                    className="w-full h-14 bg-slate-900 dark:bg-blue-600 disabled:opacity-50 text-white rounded-2xl font-semibold text-lg hover:scale-[1.02] active:scale-[0.98] transition-all shadow-lg mt-4"
                 >
                     Finalize Routine
                 </button>
@@ -371,8 +371,8 @@ export default function Onboarding() {
         {step === 4 && (
           <div className="space-y-8 animate-scale-in">
              <div className="text-center">
-              <h2 className="text-2xl font-bold text-navy-900 tracking-tight">Enable Auto-Pilot</h2>
-              <p className="text-slate-500 mt-2">Let myCORE handle the tracking.</p>
+              <h2 className="text-2xl font-bold text-slate-900 dark:text-white tracking-tight">Enable Auto-Pilot</h2>
+              <p className="text-slate-500 dark:text-slate-400 mt-2">Let myCORE handle the tracking.</p>
             </div>
 
             <div className="space-y-4">
@@ -387,20 +387,20 @@ export default function Onboarding() {
                     className={`
                         flex items-center gap-4 p-5 rounded-[1.5rem] border transition-all cursor-pointer group
                         ${(permissions as any)[perm.key] 
-                            ? 'bg-navy-900 border-navy-900 text-white shadow-lg transform scale-[1.02]' 
-                            : 'bg-white border-transparent hover:bg-white/60 text-slate-500'
+                            ? 'bg-slate-900 dark:bg-blue-600 border-slate-900 dark:border-blue-600 text-white shadow-lg transform scale-[1.02]' 
+                            : 'bg-white dark:bg-dark-card border-transparent dark:border-dark-border hover:bg-white/60 dark:hover:bg-dark-cardHover text-slate-500 dark:text-slate-400'
                         }
                     `}
                   >
-                    <div className={`w-10 h-10 rounded-full flex items-center justify-center shrink-0 transition-colors ${(permissions as any)[perm.key] ? 'bg-white/20' : `bg-${perm.color}-50 text-${perm.color}-500`}`}>
+                    <div className={`w-10 h-10 rounded-full flex items-center justify-center shrink-0 transition-colors ${(permissions as any)[perm.key] ? 'bg-white/20' : `bg-${perm.color}-50 dark:bg-${perm.color}-500/10 text-${perm.color}-500 dark:text-${perm.color}-400`}`}>
                       <perm.icon size={20} />
                     </div>
                     <div className="flex-1">
-                      <h3 className={`font-bold text-sm ${(permissions as any)[perm.key] ? 'text-white' : 'text-navy-900'}`}>{perm.label}</h3>
+                      <h3 className={`font-bold text-sm ${(permissions as any)[perm.key] ? 'text-white' : 'text-slate-900 dark:text-white'}`}>{perm.label}</h3>
                       <p className={`text-xs ${(permissions as any)[perm.key] ? 'text-white/60' : 'text-slate-400'}`}>{perm.desc}</p>
                     </div>
                     {(permissions as any)[perm.key] && (
-                        <div className="w-6 h-6 bg-white rounded-full flex items-center justify-center text-navy-900 animate-scale-in">
+                        <div className="w-6 h-6 bg-white dark:bg-white rounded-full flex items-center justify-center text-slate-900 animate-scale-in">
                             <Check size={14} strokeWidth={3} />
                         </div>
                     )}
@@ -410,7 +410,7 @@ export default function Onboarding() {
 
             <button 
               onClick={handleFinish}
-              className="w-full h-14 bg-navy-900 text-white rounded-2xl font-semibold text-lg shadow-lg hover:shadow-xl hover:scale-[1.02] active:scale-[0.98] transition-all"
+              className="w-full h-14 bg-slate-900 dark:bg-blue-600 text-white rounded-2xl font-semibold text-lg shadow-lg hover:shadow-xl hover:scale-[1.02] active:scale-[0.98] transition-all"
             >
               Start Journey
             </button>

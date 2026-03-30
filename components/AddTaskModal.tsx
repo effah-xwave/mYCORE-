@@ -57,23 +57,23 @@ export default function AddTaskModal({ onClose }: { onClose: () => void }) {
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/60 backdrop-blur-sm animate-fade-in">
-      <div className="bg-slate-100 rounded-3xl w-full max-w-md p-6 shadow-2xl overflow-y-auto max-h-[90vh] custom-scrollbar">
+      <div className="bg-white dark:bg-dark-card rounded-3xl w-full max-w-md p-6 shadow-2xl overflow-y-auto max-h-[90vh] custom-scrollbar border border-slate-200 dark:border-dark-border">
         <div className="flex justify-between items-center mb-6">
-          <h3 className="text-xl font-bold text-slate-900">New Task</h3>
-          <button onClick={onClose} className="p-1 rounded-full hover:bg-slate-300 transition-colors">
+          <h3 className="text-xl font-bold text-slate-900 dark:text-white">New Task</h3>
+          <button onClick={onClose} className="p-1 rounded-full hover:bg-slate-100 dark:hover:bg-dark-cardHover transition-colors">
             <X className="text-slate-400" size={20} />
           </button>
         </div>
         <form onSubmit={handleSubmit} className="space-y-4">
           <input 
-            className="w-full text-lg font-semibold placeholder:text-slate-300 border-none focus:ring-0 p-0 text-slate-900 bg-transparent"
+            className="w-full text-lg font-semibold placeholder:text-slate-300 dark:placeholder:text-slate-700 border-none focus:ring-0 p-0 text-slate-900 dark:text-white bg-transparent"
             placeholder="What needs to be done?"
             value={formData.title}
             onChange={e => setFormData({...formData, title: e.target.value})}
             autoFocus
           />
           <textarea 
-            className="w-full text-sm text-slate-600 placeholder:text-slate-300 border-none focus:ring-0 p-0 resize-none h-16"
+            className="w-full text-sm text-slate-600 dark:text-slate-400 placeholder:text-slate-300 dark:placeholder:text-slate-700 border-none focus:ring-0 p-0 resize-none h-16 bg-transparent"
             placeholder="Add brief description..."
             value={formData.description}
             onChange={e => setFormData({...formData, description: e.target.value})}
@@ -84,7 +84,7 @@ export default function AddTaskModal({ onClose }: { onClose: () => void }) {
               <label className="text-xs font-bold text-slate-400 uppercase">Due Date</label>
               <input 
                 type="date"
-                className="w-full mt-1 p-2 rounded-xl bg-slate-200 border border-slate-300 text-sm focus:border-slate-900 focus:outline-none transition-colors"
+                className="w-full mt-1 p-2 rounded-xl bg-slate-50 dark:bg-dark-bg border border-slate-200 dark:border-dark-border text-sm focus:border-slate-900 dark:focus:border-blue-500 focus:outline-none transition-colors text-slate-900 dark:text-white"
                 value={formData.dueDate}
                 onChange={e => setFormData({...formData, dueDate: e.target.value})}
               />
@@ -92,7 +92,7 @@ export default function AddTaskModal({ onClose }: { onClose: () => void }) {
             <div>
               <label className="text-xs font-bold text-slate-400 uppercase">Priority</label>
               <select 
-                className="w-full mt-1 p-2 rounded-xl bg-slate-200 border border-slate-300 text-sm focus:border-slate-900 focus:outline-none transition-colors"
+                className="w-full mt-1 p-2 rounded-xl bg-slate-50 dark:bg-dark-bg border border-slate-200 dark:border-dark-border text-sm focus:border-slate-900 dark:focus:border-blue-500 focus:outline-none transition-colors text-slate-900 dark:text-white"
                 value={formData.priority}
                 onChange={e => setFormData({...formData, priority: e.target.value as Priority})}
               >
@@ -105,7 +105,7 @@ export default function AddTaskModal({ onClose }: { onClose: () => void }) {
             <div>
                <label className="text-xs font-bold text-slate-400 uppercase">Project (Optional)</label>
                <select 
-                  className="w-full mt-1 p-2 rounded-xl bg-slate-200 border border-slate-300 text-sm focus:border-slate-900 focus:outline-none transition-colors"
+                  className="w-full mt-1 p-2 rounded-xl bg-slate-50 dark:bg-dark-bg border border-slate-200 dark:border-dark-border text-sm focus:border-slate-900 dark:focus:border-blue-500 focus:outline-none transition-colors text-slate-900 dark:text-white"
                   value={formData.projectId || ''}
                   onChange={e => setFormData({...formData, projectId: e.target.value || undefined})}
                >
@@ -116,7 +116,7 @@ export default function AddTaskModal({ onClose }: { onClose: () => void }) {
             <div>
                <label className="text-xs font-bold text-slate-400 uppercase">Category</label>
                <input 
-                  className="w-full mt-1 p-2 rounded-xl bg-slate-200 border border-slate-300 text-sm focus:border-slate-900 focus:outline-none transition-colors"
+                  className="w-full mt-1 p-2 rounded-xl bg-slate-50 dark:bg-dark-bg border border-slate-200 dark:border-dark-border text-sm focus:border-slate-900 dark:focus:border-blue-500 focus:outline-none transition-colors text-slate-900 dark:text-white placeholder:text-slate-300 dark:placeholder:text-slate-700"
                   value={formData.category}
                   onChange={e => setFormData({...formData, category: e.target.value})}
                   placeholder="e.g. Work"
@@ -125,13 +125,13 @@ export default function AddTaskModal({ onClose }: { onClose: () => void }) {
           </div>
 
           {/* NOTES SECTION */}
-          <div className="bg-slate-200 p-4 rounded-xl border border-slate-300">
+          <div className="bg-slate-50 dark:bg-dark-bg/50 p-4 rounded-xl border border-slate-200 dark:border-dark-border">
              <div className="flex items-center gap-2 mb-2">
-                <StickyNote size={14} className="text-slate-900" />
+                <StickyNote size={14} className="text-slate-900 dark:text-white" />
                 <label className="text-xs font-bold text-slate-400 uppercase">Notes</label>
              </div>
              <textarea 
-                className="w-full p-2 rounded-lg bg-slate-200 border border-slate-300 text-sm focus:border-slate-900 focus:outline-none placeholder:text-slate-300 transition-all resize-none h-20"
+                className="w-full p-2 rounded-lg bg-slate-50 dark:bg-dark-bg border border-slate-200 dark:border-dark-border text-sm focus:border-slate-900 dark:focus:border-blue-500 focus:outline-none placeholder:text-slate-300 dark:placeholder:text-slate-700 transition-all resize-none h-20 text-slate-900 dark:text-white"
                 placeholder="Add detailed scratchpad notes here..."
                 value={formData.notes}
                 onChange={e => setFormData({...formData, notes: e.target.value})}
@@ -139,16 +139,16 @@ export default function AddTaskModal({ onClose }: { onClose: () => void }) {
           </div>
 
           {/* SUBTASKS SECTION */}
-          <div className="bg-slate-200 p-4 rounded-xl border border-slate-300">
+          <div className="bg-slate-50 dark:bg-dark-bg/50 p-4 rounded-xl border border-slate-200 dark:border-dark-border">
              <div className="flex items-center gap-2 mb-2">
-                <ListChecks size={14} className="text-slate-900" />
+                <ListChecks size={14} className="text-slate-900 dark:text-white" />
                 <label className="text-xs font-bold text-slate-400 uppercase">Subtasks</label>
              </div>
              
              <div className="space-y-2 mb-3">
                 {subtasks.map(st => (
-                    <div key={st.id} className="flex items-center justify-between bg-slate-200 p-2 rounded-lg text-sm border border-slate-300 shadow-sm animate-fade-in">
-                        <span className="truncate flex-1 mr-2 text-slate-700">{st.title}</span>
+                    <div key={st.id} className="flex items-center justify-between bg-white dark:bg-dark-bg p-2 rounded-lg text-sm border border-slate-200 dark:border-dark-border shadow-sm animate-fade-in">
+                        <span className="truncate flex-1 mr-2 text-slate-700 dark:text-slate-300">{st.title}</span>
                         <button type="button" onClick={() => removeSubtask(st.id)} className="text-slate-300 hover:text-red-500 transition-colors">
                             <Trash2 size={14}/>
                         </button>
@@ -158,28 +158,28 @@ export default function AddTaskModal({ onClose }: { onClose: () => void }) {
 
              <div className="flex gap-2">
                  <input 
-                    className="flex-1 p-2 rounded-lg bg-slate-200 border border-slate-300 text-sm focus:border-slate-900 focus:outline-none placeholder:text-slate-300 transition-all"
+                    className="flex-1 p-2 rounded-lg bg-white dark:bg-dark-bg border border-slate-200 dark:border-dark-border text-sm focus:border-slate-900 dark:focus:border-blue-500 focus:outline-none placeholder:text-slate-300 dark:placeholder:text-slate-700 transition-all text-slate-900 dark:text-white"
                     placeholder="Add a subtask..."
                     value={newSubtask}
                     onChange={e => setNewSubtask(e.target.value)}
                     onKeyDown={e => e.key === 'Enter' && (e.preventDefault(), addSubtask())}
                  />
-                 <button type="button" onClick={addSubtask} className="p-2 bg-slate-200 border border-slate-300 rounded-lg hover:border-slate-900 hover:text-slate-900 text-slate-400 transition-colors">
+                 <button type="button" onClick={addSubtask} className="p-2 bg-white dark:bg-dark-bg border border-slate-200 dark:border-dark-border rounded-lg hover:border-slate-900 dark:hover:border-blue-500 hover:text-slate-900 dark:hover:text-white text-slate-400 transition-colors">
                      <Plus size={18} />
                  </button>
              </div>
           </div>
 
           {/* ATTACHMENTS SECTION */}
-          <div className="bg-slate-200 p-4 rounded-xl border border-slate-300">
+          <div className="bg-slate-50 dark:bg-dark-bg/50 p-4 rounded-xl border border-slate-200 dark:border-dark-border">
              <div className="flex items-center gap-2 mb-2">
-                <Paperclip size={14} className="text-slate-900" />
+                <Paperclip size={14} className="text-slate-900 dark:text-white" />
                 <label className="text-xs font-bold text-slate-400 uppercase">Attachment (URL)</label>
              </div>
-             <div className="flex items-center gap-2 bg-slate-200 rounded-lg border border-slate-300 px-3 py-2 focus-within:border-slate-900 transition-colors">
+             <div className="flex items-center gap-2 bg-white dark:bg-dark-bg rounded-lg border border-slate-200 dark:border-dark-border px-3 py-2 focus-within:border-slate-900 dark:focus-within:border-blue-500 transition-colors">
                  <Link size={14} className="text-slate-300" />
                  <input 
-                    className="w-full text-sm focus:outline-none placeholder:text-slate-300 text-slate-900 bg-transparent"
+                    className="w-full text-sm focus:outline-none placeholder:text-slate-300 dark:placeholder:text-slate-700 text-slate-900 dark:text-white bg-transparent"
                     placeholder="e.g., https://drive.google.com/file..."
                     value={attachment}
                     onChange={e => setAttachment(e.target.value)}
@@ -187,7 +187,7 @@ export default function AddTaskModal({ onClose }: { onClose: () => void }) {
              </div>
           </div>
 
-          <button type="submit" className="w-full bg-slate-900 text-white py-3 rounded-xl font-medium shadow-lg hover:bg-slate-800 transition-all">
+          <button type="submit" className="w-full bg-slate-900 dark:bg-blue-600 text-white py-3 rounded-xl font-medium shadow-lg hover:bg-slate-800 dark:hover:bg-blue-700 transition-all">
             Create Task
           </button>
         </form>

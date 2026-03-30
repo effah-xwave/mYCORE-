@@ -66,6 +66,8 @@ export interface User {
     notificationsEnabled: boolean;
     screenTimeEnabled: boolean;
   };
+  coachName?: string;
+  lastCoachRenameDate?: string; // ISO date string
 }
 
 export interface DayStats {
