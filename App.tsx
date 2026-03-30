@@ -9,7 +9,7 @@ import { NotificationService } from './services/notificationService';
 // Icons
 import { 
   LayoutDashboard, Compass, BarChart2, Settings, Loader2, CheckSquare, 
-  LogOut, Sun, Moon, Search, Bell, Menu, X, Briefcase
+  LogOut, Sun, Moon, Search, Bell, Menu, X, Briefcase, Navigation
 } from 'lucide-react';
 
 // Components
@@ -21,6 +21,8 @@ import Analytics from './components/Analytics';
 import SettingsPage from './components/SettingsPage';
 import TasksPage from './components/TasksPage';
 import ProjectsPage from './components/ProjectsPage';
+import MapsAgent from './components/MapsAgent';
+import LoadingTransition from './components/LoadingTransition';
 
 // --- CONTEXT ---
 // Export AppContextType to assist in type inference for consumers like Dashboard
@@ -77,6 +79,7 @@ export default function App() {
   const [remindersSent, setRemindersSent] = useState(false);
   const [theme, setTheme] = useState<'light' | 'dark'>('dark');
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [showTransition, setShowTransition] = useState(false);
 
   // Initialize Theme
   useEffect(() => {
@@ -110,6 +113,7 @@ export default function App() {
         setUser(u);
         if (u && u.onboarded) {
             await refreshData();
+            setShowTransition(true);
         }
     } catch (e) {
         console.error("Failed to load user profile", e);
@@ -120,6 +124,7 @@ export default function App() {
   const handleLoginSuccess = async (email: string, name: string) => {
     setIsAuthenticated(true);
     await loadUserProfile(email, name);
+    setShowTransition(true);
   };
 
   const refreshData = async () => {
@@ -182,6 +187,7 @@ export default function App() {
     await db.completeOnboarding(user.id, interests, finalHabits, permissions);
     await refreshData();
     setIsLoading(false);
+    setShowTransition(true);
   };
 
   const updateSettings = async (newSettings: User['settings']) => {
@@ -249,6 +255,7 @@ export default function App() {
     setProjects([]);
     setCurrentWeekInstances({});
     setActiveTab('dashboard');
+    setShowTransition(false);
   }
 
   // --- TASK ACTIONS ---
@@ -313,7 +320,12 @@ export default function App() {
 
   return (
     <AppContext.Provider value={contextValue}>
-      {!isAuthenticated ? (
+      {showTransition && user ? (
+        <LoadingTransition 
+          userName={user.name} 
+          onComplete={() => setShowTransition(false)} 
+        />
+      ) : !isAuthenticated ? (
         <Auth onSuccess={handleLoginSuccess} />
       ) : !user?.onboarded ? (
         <Onboarding />
@@ -343,6 +355,7 @@ export default function App() {
                   { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
                   { id: 'projects', label: 'Projects', icon: Briefcase },
                   { id: 'tasks', label: 'Tasks', icon: CheckSquare },
+                  { id: 'navigator', label: 'Navigator', icon: Navigation },
                   { id: 'interests', label: 'Interests', icon: Compass },
                   { id: 'analytics', label: 'Analytics', icon: BarChart2 },
                   { id: 'settings', label: 'Settings', icon: Settings },
@@ -433,6 +446,7 @@ export default function App() {
                   {activeTab === 'dashboard' && <Dashboard />}
                   {activeTab === 'projects' && <ProjectsPage />}
                   {activeTab === 'tasks' && <TasksPage />}
+                  {activeTab === 'navigator' && <MapsAgent />}
                   {activeTab === 'interests' && <Interests />}
                   {activeTab === 'analytics' && <Analytics />}
                   {activeTab === 'settings' && <SettingsPage />}
@@ -454,6 +468,7 @@ export default function App() {
                         { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
                         { id: 'projects', label: 'Projects', icon: Briefcase },
                         { id: 'tasks', label: 'Tasks', icon: CheckSquare },
+                        { id: 'navigator', label: 'Navigator', icon: Navigation },
                         { id: 'interests', label: 'Interests', icon: Compass },
                         { id: 'analytics', label: 'Analytics', icon: BarChart2 },
                         { id: 'settings', label: 'Settings', icon: Settings },
