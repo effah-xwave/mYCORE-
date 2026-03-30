@@ -9,7 +9,7 @@ import HabitTriggerModal from './HabitTriggerModal';
 import HabitDetailModal from './HabitDetailModal';
 import AddTaskModal from './AddTaskModal';
 import OptimizeRoutineModal from './OptimizeRoutineModal';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { 
   CheckSquare, ArrowRight, Plus, Calendar, MoreHorizontal, 
   TrendingUp, Activity, Zap, Brain, DollarSign, Smartphone, BookOpen
@@ -123,7 +123,13 @@ const HabitItem: React.FC<HabitItemProps> = ({ habit, instance, onTrigger, onVie
     const isCompleted = instance?.completed;
 
     return (
-        <div 
+        <motion.div 
+            layout
+            initial={false}
+            animate={{ 
+                scale: isCompleted ? [1, 1.02, 1] : 1,
+            }}
+            transition={{ duration: 0.3 }}
             onClick={() => onViewDetail(habit)}
             className={`
                 group relative flex items-center justify-between p-5 rounded-3xl transition-all duration-300 cursor-pointer border
@@ -168,9 +174,21 @@ const HabitItem: React.FC<HabitItemProps> = ({ habit, instance, onTrigger, onVie
                     : 'border-white/10 hover:border-blue-500'
                 }
             `}>
-                {isCompleted && <Icons.Check size={16} className="text-white" strokeWidth={4} />}
+                <AnimatePresence mode="wait">
+                    {isCompleted && (
+                        <motion.div
+                            key="check"
+                            initial={{ scale: 0, opacity: 0 }}
+                            animate={{ scale: 1, opacity: 1 }}
+                            exit={{ scale: 0, opacity: 0 }}
+                            transition={{ type: "spring", stiffness: 500, damping: 30 }}
+                        >
+                            <Icons.Check size={16} className="text-white" strokeWidth={4} />
+                        </motion.div>
+                    )}
+                </AnimatePresence>
             </button>
-        </div>
+        </motion.div>
     )
 }
 

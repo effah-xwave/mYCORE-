@@ -399,6 +399,12 @@ export default function App() {
                   >
                     <tab.icon size={22} strokeWidth={activeTab === tab.id ? 2.5 : 2} className="shrink-0" />
                     <span className="hidden lg:block font-semibold text-[15px]">{tab.label}</span>
+                    
+                    {/* Floating Tooltip for Collapsed State */}
+                    <div className="lg:hidden absolute left-full ml-4 px-3 py-2 bg-slate-900 dark:bg-dark-card text-white text-xs font-bold rounded-xl opacity-0 group-hover:opacity-100 pointer-events-none transition-all duration-200 whitespace-nowrap z-[100] shadow-2xl border border-slate-200 dark:border-dark-border translate-x-[-10px] group-hover:translate-x-0">
+                      {tab.label}
+                      <div className="absolute right-full top-1/2 -translate-y-1/2 border-8 border-transparent border-r-slate-900 dark:border-r-dark-border" />
+                    </div>
                     {activeTab === tab.id && (
                         <motion.div 
                           layoutId="activeTab"
@@ -447,14 +453,22 @@ export default function App() {
                 <div className="flex items-center gap-5">
                    <button 
                       onClick={toggleTheme}
-                      className="w-11 h-11 rounded-2xl flex items-center justify-center text-slate-600 hover:bg-slate-100 dark:text-slate-400 dark:hover:bg-dark-cardHover transition-all border border-transparent hover:border-slate-200 dark:hover:border-dark-border"
+                      className="group relative w-11 h-11 rounded-2xl flex items-center justify-center text-slate-600 hover:bg-slate-100 dark:text-slate-400 dark:hover:bg-dark-cardHover transition-all border border-transparent hover:border-slate-200 dark:hover:border-dark-border"
                    >
                       {theme === 'light' ? <Moon size={20} /> : <Sun size={20} />}
+                      <div className="absolute top-full mt-3 px-3 py-2 bg-slate-900 dark:bg-dark-card text-white text-[10px] font-bold rounded-xl opacity-0 group-hover:opacity-100 pointer-events-none transition-all duration-200 whitespace-nowrap z-[100] shadow-2xl border border-slate-200 dark:border-dark-border translate-y-[-5px] group-hover:translate-y-0">
+                        {theme === 'light' ? 'Dark Mode' : 'Light Mode'}
+                        <div className="absolute bottom-full left-1/2 -translate-x-1/2 border-8 border-transparent border-b-slate-900 dark:border-b-dark-border" />
+                      </div>
                    </button>
                    
-                   <button className="w-11 h-11 rounded-2xl flex items-center justify-center text-slate-600 hover:bg-slate-100 dark:text-slate-400 dark:hover:bg-dark-cardHover transition-all border border-transparent hover:border-slate-200 dark:hover:border-dark-border relative">
+                   <button className="group relative w-11 h-11 rounded-2xl flex items-center justify-center text-slate-600 hover:bg-slate-100 dark:text-slate-400 dark:hover:bg-dark-cardHover transition-all border border-transparent hover:border-slate-200 dark:hover:border-dark-border">
                       <Bell size={20} />
                       <span className="absolute top-3 right-3.5 w-2 h-2 bg-blue-500 rounded-full border-2 border-white dark:border-dark-card" />
+                      <div className="absolute top-full mt-3 px-3 py-2 bg-slate-900 dark:bg-dark-card text-white text-[10px] font-bold rounded-xl opacity-0 group-hover:opacity-100 pointer-events-none transition-all duration-200 whitespace-nowrap z-[100] shadow-2xl border border-slate-200 dark:border-dark-border translate-y-[-5px] group-hover:translate-y-0">
+                        Notifications
+                        <div className="absolute bottom-full left-1/2 -translate-x-1/2 border-8 border-transparent border-b-slate-900 dark:border-b-dark-border" />
+                      </div>
                    </button>
 
                    <div className="hidden sm:flex items-center gap-4 pl-5 border-l border-slate-200 dark:border-dark-border">
