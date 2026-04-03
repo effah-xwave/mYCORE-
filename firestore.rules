@@ -1,0 +1,216 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ===============================================================
+    // Assumed Data Model
+    // ===============================================================
+    //
+    // Collection: /users/{userId}
+    // Document ID: userId (matches request.auth.uid)
+    // Fields:
+    //   - id: string (required)
+    //   - email: string (required, format: email)
+    //   - name: string (required)
+    //   - onboarded: boolean (required)
+    //   - interests: array of strings (required)
+    //   - settings: map (required)
+    //   - coachName: string (optional)
+    //   - lastCoachRenameDate: string (optional, format: date-time)
+    //
+    // Collection: /users/{userId}/habits/{habitId}
+    // Document ID: habitId
+    // Fields:
+    //   - id: string (required)
+    //   - name: string (required)
+    //   - icon: string (required)
+    //   - interest: string (required)
+    //   - schedule: string (required)
+    //   - triggerType: string (required)
+    //   - triggerConfig: map (optional)
+    //   - goal: map (optional)
+    //   - streak: number (required)
+    //   - isFavorite: boolean (optional)
+    //
+    // Collection: /users/{userId}/habitInstances/{instanceId}
+    // Document ID: instanceId
+    // Fields:
+    //   - id: string (required)
+    //   - habitId: string (required)
+    //   - date: string (required, format: YYYY-MM-DD)
+    //   - completed: boolean (required)
+    //   - completedAt: string (optional, format: date-time)
+    //   - value: number (optional)
+    //
+    // Collection: /users/{userId}/tasks/{taskId}
+    // Document ID: taskId
+    // Fields:
+    //   - id: string (required)
+    //   - title: string (required)
+    //   - description: string (optional)
+    //   - notes: string (optional)
+    //   - dueDate: string (required, format: YYYY-MM-DD)
+    //   - dueTime: string (optional)
+    //   - priority: string (required)
+    //   - category: string (required)
+    //   - projectId: string (optional)
+    //   - completed: boolean (required)
+    //   - reminder: map (optional)
+    //   - subtasks: array of maps (optional)
+    //   - attachments: array of strings (optional)
+    //
+    // Collection: /users/{userId}/projects/{projectId}
+    // Document ID: projectId
+    // Fields:
+    //   - id: string (required)
+    //   - name: string (required)
+    //   - description: string (optional)
+    //   - startDate: string (required)
+    //   - endDate: string (required)
+    //   - progress: number (required, 0-100)
+    //   - status: string (required)
+    //   - color: string (optional)
+    //
+    // ===============================================================
+
+    // ===============================================================
+    // Helper Functions
+    // ===============================================================
+
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+
+    function isAdmin() {
+      return isAuthenticated() &&
+        (get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin' ||
+          (request.auth.token.email == "mrmcquanin@gmail.com" && request.auth.token.email_verified == true));
+    }
+
+    function hasRequiredFields(fields) {
+      return request.resource.data.keys().hasAll(fields);
+    }
+
+    function hasOnlyAllowedFields(fields) {
+      return request.resource.data.keys().hasOnly(fields);
+    }
+
+    function isValidEmail(email) {
+      return email is string && email.matches("^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$");
+    }
+
+    function isValidDateString(dateStr) {
+      return dateStr is string && dateStr.matches("^\\d{4}-\\d{2}-\\d{2}$");
+    }
+
+    function isValidDateTimeString(dateTimeStr) {
+      return dateTimeStr is string && dateTimeStr.matches("^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}.*Z?$");
+    }
+
+    // ===============================================================
+    // Domain Validators
+    // ===============================================================
+
+    function isValidUser(data) {
+      return hasRequiredFields(['id', 'email', 'name', 'onboarded', 'interests', 'settings']) &&
+             data.id is string && data.id.size() > 0 && data.id.size() < 128 &&
+             data.email is string && isValidEmail(data.email) && data.email.size() < 256 &&
+             data.name is string && data.name.size() > 0 && data.name.size() < 100 &&
+             data.onboarded is bool &&
+             data.interests is list && data.interests.size() <= 30 &&
+             data.settings is map && data.settings.keys().hasAll(['locationEnabled', 'notificationsEnabled', 'screenTimeEnabled']);
+    }
+
+    function isValidHabit(data) {
+      return hasRequiredFields(['id', 'name', 'icon', 'interest', 'schedule', 'triggerType', 'streak']) &&
+             data.id is string && data.id.size() < 128 &&
+             data.name is string && data.name.size() > 0 && data.name.size() < 100 &&
+             data.icon is string && data.icon.size() < 100 &&
+             data.interest is string && data.interest.size() < 100 &&
+             data.schedule is string && data.triggerType is string &&
+             data.streak is number && data.streak >= 0;
+    }
+
+    function isValidHabitInstance(data) {
+      return hasRequiredFields(['id', 'habitId', 'date', 'completed']) &&
+             data.id is string && data.id.size() < 128 &&
+             data.habitId is string && data.habitId.size() < 128 &&
+             isValidDateString(data.date) &&
+             data.completed is bool;
+    }
+
+    function isValidTask(data) {
+      return hasRequiredFields(['id', 'title', 'dueDate', 'priority', 'category', 'completed']) &&
+             data.id is string && data.id.size() < 128 &&
+             data.title is string && data.title.size() > 0 && data.title.size() < 200 &&
+             isValidDateString(data.dueDate) &&
+             data.priority is string && data.category is string &&
+             data.completed is bool;
+    }
+
+    function isValidProject(data) {
+      return hasRequiredFields(['id', 'name', 'startDate', 'endDate', 'progress', 'status']) &&
+             data.id is string && data.id.size() < 128 &&
+             data.name is string && data.name.size() > 0 && data.name.size() < 100 &&
+             isValidDateString(data.startDate) && isValidDateString(data.endDate) &&
+             data.progress is number && data.progress >= 0 && data.progress <= 100 &&
+             data.status is string;
+    }
+
+    // ===============================================================
+    // Rules
+    // ===============================================================
+
+    match /users/{userId} {
+      allow read: if isOwner(userId) || isAdmin();
+      allow create: if isOwner(userId) && isValidUser(request.resource.data);
+      allow update: if (isOwner(userId) && isValidUser(request.resource.data) && 
+                       request.resource.data.id == resource.data.id &&
+                       request.resource.data.email == resource.data.email) || isAdmin();
+      allow delete: if isAdmin();
+
+      match /habits/{habitId} {
+        allow read: if isOwner(userId) || isAdmin();
+        allow create: if isOwner(userId) && isValidHabit(request.resource.data);
+        allow update: if (isOwner(userId) && isValidHabit(request.resource.data) &&
+                         request.resource.data.id == resource.data.id) || isAdmin();
+        allow delete: if isOwner(userId) || isAdmin();
+      }
+
+      match /habitInstances/{instanceId} {
+        allow read: if isOwner(userId) || isAdmin();
+        allow create: if isOwner(userId) && isValidHabitInstance(request.resource.data);
+        allow update: if (isOwner(userId) && isValidHabitInstance(request.resource.data) &&
+                         request.resource.data.id == resource.data.id &&
+                         request.resource.data.habitId == resource.data.habitId &&
+                         request.resource.data.date == resource.data.date) || isAdmin();
+        allow delete: if isOwner(userId) || isAdmin();
+      }
+
+      match /tasks/{taskId} {
+        allow read: if isOwner(userId) || isAdmin();
+        allow create: if isOwner(userId) && isValidTask(request.resource.data);
+        allow update: if (isOwner(userId) && isValidTask(request.resource.data) &&
+                         request.resource.data.id == resource.data.id) || isAdmin();
+        allow delete: if isOwner(userId) || isAdmin();
+      }
+
+      match /projects/{projectId} {
+        allow read: if isOwner(userId) || isAdmin();
+        allow create: if isOwner(userId) && isValidProject(request.resource.data);
+        allow update: if (isOwner(userId) && isValidProject(request.resource.data) &&
+                         request.resource.data.id == resource.data.id) || isAdmin();
+        allow delete: if isOwner(userId) || isAdmin();
+      }
+    }
+
+    // Default deny
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

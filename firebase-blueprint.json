@@ -1,0 +1,148 @@
+{
+  "entities": {
+    "User": {
+      "title": "User",
+      "description": "User profile and settings",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "email": { "type": "string", "format": "email" },
+        "name": { "type": "string" },
+        "onboarded": { "type": "boolean" },
+        "interests": { "type": "array", "items": { "type": "string" } },
+        "settings": {
+          "type": "object",
+          "properties": {
+            "locationEnabled": { "type": "boolean" },
+            "notificationsEnabled": { "type": "boolean" },
+            "screenTimeEnabled": { "type": "boolean" }
+          }
+        },
+        "coachName": { "type": "string" },
+        "lastCoachRenameDate": { "type": "string", "format": "date-time" }
+      },
+      "required": ["id", "email", "name", "onboarded", "interests", "settings"]
+    },
+    "Habit": {
+      "title": "Habit",
+      "description": "A habit defined by the user",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "name": { "type": "string" },
+        "icon": { "type": "string" },
+        "interest": { "type": "string" },
+        "schedule": { "type": "string" },
+        "triggerType": { "type": "string" },
+        "triggerConfig": {
+          "type": "object",
+          "properties": {
+            "locationName": { "type": "string" },
+            "thresholdMinutes": { "type": "number" },
+            "appName": { "type": "string" },
+            "actionDetail": { "type": "string" }
+          }
+        },
+        "goal": {
+          "type": "object",
+          "properties": {
+            "target": { "type": "number" },
+            "unit": { "type": "string" }
+          }
+        },
+        "streak": { "type": "number" },
+        "isFavorite": { "type": "boolean" }
+      },
+      "required": ["id", "name", "icon", "interest", "schedule", "triggerType", "streak"]
+    },
+    "HabitInstance": {
+      "title": "HabitInstance",
+      "description": "A daily instance of a habit",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "habitId": { "type": "string" },
+        "date": { "type": "string" },
+        "completed": { "type": "boolean" },
+        "completedAt": { "type": "string", "format": "date-time" },
+        "value": { "type": "number" }
+      },
+      "required": ["id", "habitId", "date", "completed"]
+    },
+    "Task": {
+      "title": "Task",
+      "description": "A single task",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "title": { "type": "string" },
+        "description": { "type": "string" },
+        "notes": { "type": "string" },
+        "dueDate": { "type": "string" },
+        "dueTime": { "type": "string" },
+        "priority": { "type": "string" },
+        "category": { "type": "string" },
+        "projectId": { "type": "string" },
+        "completed": { "type": "boolean" },
+        "reminder": {
+          "type": "object",
+          "properties": {
+            "type": { "type": "string" },
+            "customDate": { "type": "string", "format": "date-time" }
+          }
+        },
+        "subtasks": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "id": { "type": "string" },
+              "title": { "type": "string" },
+              "completed": { "type": "boolean" }
+            }
+          }
+        },
+        "attachments": { "type": "array", "items": { "type": "string" } }
+      },
+      "required": ["id", "title", "dueDate", "priority", "category", "completed"]
+    },
+    "Project": {
+      "title": "Project",
+      "description": "A project containing tasks",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "name": { "type": "string" },
+        "description": { "type": "string" },
+        "startDate": { "type": "string" },
+        "endDate": { "type": "string" },
+        "progress": { "type": "number" },
+        "status": { "type": "string" },
+        "color": { "type": "string" }
+      },
+      "required": ["id", "name", "startDate", "endDate", "progress", "status"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": { "$ref": "User" },
+      "description": "User profile"
+    },
+    "/users/{userId}/habits/{habitId}": {
+      "schema": { "$ref": "Habit" },
+      "description": "User habits"
+    },
+    "/users/{userId}/habitInstances/{instanceId}": {
+      "schema": { "$ref": "HabitInstance" },
+      "description": "Daily habit completions"
+    },
+    "/users/{userId}/tasks/{taskId}": {
+      "schema": { "$ref": "Task" },
+      "description": "User tasks"
+    },
+    "/users/{userId}/projects/{projectId}": {
+      "schema": { "$ref": "Project" },
+      "description": "User projects"
+    }
+  }
+}

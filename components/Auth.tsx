@@ -27,14 +27,14 @@ export default function Auth({ onSuccess }: AuthProps) {
           await AuthService.resetPassword(email);
           setSuccessMsg('If an account exists, a reset link has been sent to your email.');
       } else {
-          let res;
+          let res: any;
           if (view === 'login') {
             res = await AuthService.login(email, password);
           } else {
             res = await AuthService.signup(email, password);
           }
           const name = email.split('@')[0];
-          onSuccess(res.user.email, name);
+          onSuccess(res.user.email || '', name);
       }
     } catch (err: any) {
       setError(err.message || 'Authentication failed');
@@ -47,8 +47,7 @@ export default function Auth({ onSuccess }: AuthProps) {
     setLoading(true);
     try {
       const res = await AuthService.loginWithGoogle();
-      const name = "Demo User";
-      onSuccess(res.email, name);
+      onSuccess(res.email || '', res.user_metadata.name);
     } catch (err) {
       setError('Google Auth failed');
     } finally {

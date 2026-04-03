@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { User, Habit, HabitInstance, InterestType, Task, Project } from './types';
 import { db } from './services/mockDb';
 import { AuthService } from './services/auth';
+import { FirebaseAuthService } from './services/firebaseAuth';
 import { formatDate, getWeekDays } from './utils';
 import { NotificationService } from './services/notificationService';
 
@@ -102,14 +103,17 @@ export default function App() {
 
   // Check Auth Status on Mount
   useEffect(() => {
-    AuthService.getSession().then(session => {
-        if (session && session.user) {
-            setIsAuthenticated(true);
-            loadUserProfile(session.user.email || '', session.user.user_metadata.name || 'User');
-        } else {
-            setIsLoading(false);
-        }
+    const unsubscribe = FirebaseAuthService.subscribeToAuthChanges(async (fbUser) => {
+      if (fbUser) {
+        setIsAuthenticated(true);
+        await loadUserProfile(fbUser.email || '', fbUser.displayName || fbUser.email?.split('@')[0] || 'User');
+      } else {
+        setIsAuthenticated(false);
+        setUser(null);
+        setIsLoading(false);
+      }
     });
+    return () => unsubscribe();
   }, []);
 
   const loadUserProfile = async (email: string, name: string) => {
@@ -128,8 +132,7 @@ export default function App() {
   };
 
   const handleLoginSuccess = async (email: string, name: string) => {
-    setIsAuthenticated(true);
-    await loadUserProfile(email, name);
+    // Auth listener will handle the state change and load profile
     setShowTransition(true);
   };
 
