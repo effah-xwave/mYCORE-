@@ -210,6 +210,28 @@ export const FirebaseDBService = {
     }
   },
 
+  async addHabit(habit: Habit): Promise<void> {
+    const userId = auth.currentUser?.uid;
+    if (!userId) return;
+    const path = `users/${userId}/habits/${habit.id}`;
+    try {
+      await setDoc(doc(db, path), habit);
+    } catch (error) {
+      handleFirestoreError(error, OperationType.WRITE, path);
+    }
+  },
+
+  async deleteHabit(habitId: string): Promise<void> {
+    const userId = auth.currentUser?.uid;
+    if (!userId) return;
+    const path = `users/${userId}/habits/${habitId}`;
+    try {
+      await deleteDoc(doc(db, path));
+    } catch (error) {
+      handleFirestoreError(error, OperationType.DELETE, path);
+    }
+  },
+
   // --- INSTANCES ---
   async getWeekInstances(dates: string[]): Promise<HabitInstance[]> {
     const userId = auth.currentUser?.uid;
@@ -375,7 +397,7 @@ export const FirebaseDBService = {
         { id: 'h1', name: 'Morning Run (Gym)', icon: 'Activity', interest: InterestType.HEALTH, schedule: ScheduleType.DAILY, triggerType: TriggerType.LOCATION, triggerConfig: { locationName: 'Gold\'s Gym' }, streak: 0 },
         { id: 'h2', name: 'Market Analysis', icon: 'TrendingUp', interest: InterestType.FINANCE, schedule: ScheduleType.WEEKDAYS, triggerType: TriggerType.APP_OPEN, triggerConfig: { appName: 'Market Terminal', actionDetail: 'Check S&P 500' }, streak: 0 },
         { id: 'h3', name: 'Social Media < 30m', icon: 'Smartphone', interest: InterestType.DETOX, schedule: ScheduleType.DAILY, triggerType: TriggerType.SCREEN_TIME, triggerConfig: { thresholdMinutes: 30 }, streak: 0 },
-        { id: 'h4', name: 'Read 1 Chapter', icon: 'BookOpen', interest: InterestType.LEARNING, schedule: ScheduleType.DAILY, triggerType: TriggerType.MANUAL, streak: 0 },
+        { id: 'h4', name: 'Read Arch Insight', icon: 'BookOpen', interest: InterestType.LEARNING, schedule: ScheduleType.DAILY, triggerType: TriggerType.MANUAL, streak: 0 },
         { id: 'h5', name: 'Deep Work Session', icon: 'Zap', interest: InterestType.PRODUCTIVITY, schedule: ScheduleType.WEEKDAYS, triggerType: TriggerType.APP_OPEN, triggerConfig: { appName: 'Timer Started' }, streak: 0 }
     ];
 

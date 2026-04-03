@@ -4,6 +4,7 @@ export const InterestType = {
   PRODUCTIVITY: 'Productivity',
   FINANCE: 'Finance',
   LEARNING: 'Learning',
+  READING: 'Reading',
   DETOX: 'Detox',
   CUSTOM: 'Custom',
 } as const;
@@ -44,6 +45,8 @@ export interface Habit {
   };
   streak: number;
   isFavorite?: boolean;
+  color?: string;
+  priority?: Priority;
 }
 
 export interface HabitInstance {

@@ -27,6 +27,7 @@ import MapsAgent from './components/MapsAgent';
 import GrowthChatbot from './components/GrowthChatbot';
 import OptimizeRoutineModal from './components/OptimizeRoutineModal';
 import LoadingTransition from './components/LoadingTransition';
+import ArticleReader from './components/ArticleReader';
 
 // --- CONTEXT ---
 // Export AppContextType to assist in type inference for consumers like Dashboard
@@ -55,10 +56,14 @@ export interface AppContextType {
   deleteProject: (projectId: string) => Promise<void>;
   deleteTask: (taskId: string) => Promise<void>;
   // Habit Helpers
+  addHabit: (habit: Habit) => Promise<void>;
+  deleteHabit: (habitId: string) => Promise<void>;
   toggleHabitFavorite: (habitId: string) => Promise<void>;
   getInstancesForRange: (startDate: string, endDate: string) => Promise<HabitInstance[]>;
   // Coach
   updateCoachName: (newName: string) => Promise<void>;
+  // Article Reader
+  openArticleReader: () => void;
   // Theme
   theme: 'light' | 'dark';
   toggleTheme: () => void;
@@ -87,6 +92,7 @@ export default function App() {
   const [theme, setTheme] = useState<'light' | 'dark'>('dark');
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [showTransition, setShowTransition] = useState(false);
+  const [isArticleReaderOpen, setIsArticleReaderOpen] = useState(false);
 
   // Initialize Theme
   useEffect(() => {
@@ -297,6 +303,16 @@ export default function App() {
     await refreshData();
   };
 
+  const addHabit = async (habit: Habit) => {
+    await db.addHabit(habit);
+    await refreshData();
+  };
+
+  const deleteHabit = async (habitId: string) => {
+    await db.deleteHabit(habitId);
+    await refreshData();
+  };
+
   const deleteTask = async (taskId: string) => {
     await db.deleteTask(taskId);
     await refreshData();
@@ -316,6 +332,10 @@ export default function App() {
     await refreshData();
   };
 
+  const openArticleReader = () => {
+    setIsArticleReaderOpen(true);
+  };
+
 
   if (isLoading) {
     return (
@@ -332,9 +352,11 @@ export default function App() {
     user, habits, currentWeekInstances, tasks, projects, refreshData, isLoading, 
     activeTab, setActiveTab, completeOnboarding, handleTrigger, 
     updateSettings, resetApp, isAuthenticated, handleLoginSuccess,
-    addTask, updateTask, toggleTask, addProject, updateProject, deleteProject, deleteTask, toggleHabitFavorite,
+    addTask, updateTask, toggleTask, addProject, updateProject, deleteProject, deleteTask, 
+    addHabit, deleteHabit, toggleHabitFavorite,
     getInstancesForRange,
     updateCoachName,
+    openArticleReader,
     theme, toggleTheme
   };
 
@@ -544,6 +566,9 @@ export default function App() {
                    </div>
                 </div>
              </div>
+          )}
+          {isArticleReaderOpen && (
+            <ArticleReader onClose={() => setIsArticleReaderOpen(false)} />
           )}
         </div>
       )}

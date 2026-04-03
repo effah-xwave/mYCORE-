@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { useApp } from '../App';
 import { getWeekDays, formatDate, getDayName, calculateCompletion } from '../utils';
 // Add Task and Priority imports to ensure tasks array is correctly typed
@@ -9,6 +9,7 @@ import HabitTriggerModal from './HabitTriggerModal';
 import HabitDetailModal from './HabitDetailModal';
 import AddTaskModal from './AddTaskModal';
 import OptimizeRoutineModal from './OptimizeRoutineModal';
+import AddHabitModal from './AddHabitModal';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   CheckSquare, ArrowRight, Plus, Calendar, MoreHorizontal, 
@@ -119,8 +120,10 @@ interface HabitItemProps {
 }
 
 const HabitItem: React.FC<HabitItemProps> = ({ habit, instance, onTrigger, onViewDetail }) => {
+    const { openArticleReader } = useApp();
     const IconComponent = (Icons as any)[habit.icon] || Icons.Circle;
     const isCompleted = instance?.completed;
+    const isReadingHabit = habit.name.toLowerCase().includes('read');
 
     return (
         <motion.div 
@@ -162,8 +165,20 @@ const HabitItem: React.FC<HabitItemProps> = ({ habit, instance, onTrigger, onVie
                 </div>
             </div>
             
-            <button 
-              onClick={(e) => {
+            <div className="flex items-center gap-3">
+                {isReadingHabit && !isCompleted && (
+                    <button 
+                        onClick={(e) => {
+                            e.stopPropagation();
+                            openArticleReader();
+                        }}
+                        className="px-3 py-1.5 rounded-xl bg-blue-600/20 text-blue-500 text-[10px] font-bold uppercase tracking-widest hover:bg-blue-600 hover:text-white transition-all"
+                    >
+                        Read
+                    </button>
+                )}
+                <button 
+                  onClick={(e) => {
                 e.stopPropagation();
                 onTrigger(instance);
               }}
@@ -188,13 +203,14 @@ const HabitItem: React.FC<HabitItemProps> = ({ habit, instance, onTrigger, onVie
                     )}
                 </AnimatePresence>
             </button>
+            </div>
         </motion.div>
     )
 }
 
 
 export default function Dashboard() {
-  const { habits, currentWeekInstances, handleTrigger, user, tasks } = useApp();
+  const { habits, currentWeekInstances, handleTrigger, user, tasks, deleteHabit } = useApp();
   const weekDays = getWeekDays();
   const today = formatDate(new Date());
   const [selectedDate, setSelectedDate] = useState(today);
@@ -209,11 +225,27 @@ export default function Dashboard() {
 
   const [showTaskModal, setShowTaskModal] = useState(false);
   const [showOptimizeModal, setShowOptimizeModal] = useState(false);
+  const [showAddHabitModal, setShowAddHabitModal] = useState(false);
 
   const { setActiveTab } = useApp();
 
   // Stats Calculations
-  const dayInstances = currentWeekInstances[selectedDate] || [];
+  const dayInstances = useMemo(() => {
+    const existing = currentWeekInstances[selectedDate] || [];
+    // For each habit, if no instance exists for this date, create a "virtual" one
+    return habits.map(h => {
+      const instanceId = `${selectedDate}_${h.id}`;
+      const found = existing.find(i => i.habitId === h.id);
+      if (found) return found;
+      return {
+        id: instanceId,
+        habitId: h.id,
+        date: selectedDate,
+        completed: false
+      } as HabitInstance;
+    });
+  }, [habits, currentWeekInstances, selectedDate]);
+
   const completedCount = dayInstances.filter(i => i.completed).length;
   const totalCount = dayInstances.length;
   const dayScore = totalCount > 0 ? Math.round((completedCount / totalCount) * 1000) : 0; // Score out of 1000 like credit score
@@ -494,7 +526,10 @@ export default function Dashboard() {
                 )}
             </div>
             
-            <button className="mt-8 w-full py-4 rounded-2xl bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold uppercase tracking-widest transition-all shadow-glow">
+            <button 
+                onClick={() => setShowAddHabitModal(true)}
+                className="mt-8 w-full py-4 rounded-2xl bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold uppercase tracking-widest transition-all shadow-glow"
+            >
                 Add New Habit
             </button>
         </div>
@@ -520,6 +555,7 @@ export default function Dashboard() {
               const inst = dayInstances.find(i => i.habitId === detailModal.habit!.id);
               if (inst) openTrigger(inst);
             }}
+            onDelete={() => deleteHabit(detailModal.habit!.id)}
         />
       )}
 
@@ -529,6 +565,10 @@ export default function Dashboard() {
 
       {showOptimizeModal && (
         <OptimizeRoutineModal onClose={() => setShowOptimizeModal(false)} />
+      )}
+
+      {showAddHabitModal && (
+        <AddHabitModal onClose={() => setShowAddHabitModal(false)} />
       )}
     </div>
   );

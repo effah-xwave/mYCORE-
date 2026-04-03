@@ -14,6 +14,7 @@ const DEFAULT_INTERESTS = [
   { id: InterestType.PRODUCTIVITY, icon: Brain, label: 'Productivity' },
   { id: InterestType.FINANCE, icon: DollarSign, label: 'Finance' },
   { id: InterestType.LEARNING, icon: BookOpen, label: 'Learning' },
+  { id: InterestType.READING, icon: BookOpen, label: 'Reading' },
   { id: InterestType.DETOX, icon: Smartphone, label: 'Detox' },
 ];
 

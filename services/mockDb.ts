@@ -23,6 +23,10 @@ export const db = {
   
   toggleHabitFavorite: (habitId: string) => FirebaseDBService.toggleHabitFavorite(habitId),
   
+  addHabit: (habit: Habit) => FirebaseDBService.addHabit(habit),
+  
+  deleteHabit: (habitId: string) => FirebaseDBService.deleteHabit(habitId),
+  
   getWeekInstances: (dates: string[]) => FirebaseDBService.getWeekInstances(dates),
   
   getInstancesForRange: (startDate: string, endDate: string) => FirebaseDBService.getInstancesForRange(startDate, endDate),

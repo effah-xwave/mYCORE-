@@ -12,9 +12,10 @@ interface Props {
   instances: HabitInstance[];
   onClose: () => void;
   onTrigger: () => void;
+  onDelete?: () => void;
 }
 
-export default function HabitDetailModal({ habit, instances, onClose, onTrigger }: Props) {
+export default function HabitDetailModal({ habit, instances, onClose, onTrigger, onDelete }: Props) {
   const IconComponent = (Icons as any)[habit.icon] || Icons.Circle;
 
   // Prepare 7-day history data
@@ -167,10 +168,23 @@ export default function HabitDetailModal({ habit, instances, onClose, onTrigger 
         </div>
 
         {/* Action Footer */}
-        <div className="p-8 pt-0 mt-auto">
+        <div className="p-8 pt-0 mt-auto flex gap-3">
+          {onDelete && (
+            <button 
+              onClick={() => {
+                if (confirm('Are you sure you want to delete this habit?')) {
+                  onDelete();
+                  onClose();
+                }
+              }}
+              className="p-4 bg-red-50 dark:bg-red-900/10 text-red-500 rounded-2xl hover:bg-red-100 dark:hover:bg-red-900/20 transition-all"
+            >
+              <Icons.Trash2 size={20} />
+            </button>
+          )}
           <button 
             onClick={() => { onTrigger(); onClose(); }}
-            className="w-full py-4 bg-slate-900 dark:bg-blue-600 text-white rounded-2xl font-bold flex items-center justify-center gap-2 shadow-xl shadow-blue-500/10 hover:scale-[1.02] active:scale-[0.98] transition-all"
+            className="flex-1 py-4 bg-slate-900 dark:bg-blue-600 text-white rounded-2xl font-bold flex items-center justify-center gap-2 shadow-xl shadow-blue-500/10 hover:scale-[1.02] active:scale-[0.98] transition-all"
           >
             {historyData[historyData.length - 1]?.status === 1 ? <Icons.RotateCcw size={18} /> : <Icons.Zap size={18} />}
             {historyData[historyData.length - 1]?.status === 1 ? 'Update Status' : 'Execute Core Action'}
