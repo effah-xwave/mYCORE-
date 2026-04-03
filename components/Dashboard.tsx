@@ -10,11 +10,14 @@ import HabitDetailModal from './HabitDetailModal';
 import AddTaskModal from './AddTaskModal';
 import OptimizeRoutineModal from './OptimizeRoutineModal';
 import AddHabitModal from './AddHabitModal';
+import ArticleReader from './ArticleReader';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   CheckSquare, ArrowRight, Plus, Calendar, MoreHorizontal, 
-  TrendingUp, Activity, Zap, Brain, DollarSign, Smartphone, BookOpen
+  TrendingUp, Activity, Zap, Brain, DollarSign, Smartphone, BookOpen,
+  BarChart3
 } from 'lucide-react';
+import { AreaChart, Area, ResponsiveContainer, XAxis, YAxis, Tooltip, CartesianGrid } from 'recharts';
 
 // --- SUB-COMPONENTS ---
 
@@ -227,7 +230,7 @@ export default function Dashboard() {
   const [showOptimizeModal, setShowOptimizeModal] = useState(false);
   const [showAddHabitModal, setShowAddHabitModal] = useState(false);
 
-  const { setActiveTab } = useApp();
+  const { setActiveTab, openArticleReader } = useApp();
 
   // Stats Calculations
   const dayInstances = useMemo(() => {
@@ -263,9 +266,32 @@ export default function Dashboard() {
   // Use Priority.HIGH enum instead of magic string for better type safety
   const mainTask = tasks.find(t => t.priority === Priority.HIGH && !t.completed) || tasks[0];
 
+  // Weekly Progress Data for Chart
+  const weeklyProgressData = useMemo(() => {
+    return weekDays.map(date => {
+      const dateStr = formatDate(date);
+      const dayInsts = currentWeekInstances[dateStr] || [];
+      const total = habits.length;
+      const completed = dayInsts.filter(i => i.completed).length;
+      const score = total > 0 ? Math.round((completed / total) * 100) : 0;
+      return {
+        name: getDayName(date).substring(0, 3),
+        score,
+        fullDate: dateStr
+      };
+    });
+  }, [currentWeekInstances, habits, weekDays]);
+
   const openTrigger = (instance: HabitInstance) => {
     const habit = habits.find(h => h.id === instance.habitId);
     if (!habit) return;
+
+    // Special case for Reading Habit
+    if (habit.name.toLowerCase().includes('read') || habit.interest.toLowerCase().includes('learn')) {
+        openArticleReader();
+        return;
+    }
+
     if (habit.goal) {
         setTriggerModal({ isOpen: true, instance, habit });
         return;
@@ -345,12 +371,21 @@ export default function Dashboard() {
                     const h = habits.find(x => x.id === inst.habitId);
                     if (!h) return null;
                     return (
-                        <div key={inst.id} className="flex items-center gap-4 p-5 rounded-3xl bg-slate-50 dark:bg-dark-cardHover/20 border border-slate-200 dark:border-dark-border/50 hover:bg-slate-100 dark:hover:bg-dark-cardHover/40 transition-all cursor-pointer group">
-                            <div className="w-1.5 h-10 bg-blue-500 rounded-full group-hover:h-12 transition-all" />
+                        <div 
+                            key={inst.id} 
+                            onClick={() => openTrigger(inst)}
+                            className="flex items-center gap-4 p-5 rounded-3xl bg-slate-50 dark:bg-dark-cardHover/20 border border-slate-200 dark:border-dark-border/50 hover:bg-slate-100 dark:hover:bg-dark-cardHover/40 transition-all cursor-pointer group"
+                        >
+                            <div className={`w-1.5 h-10 ${inst.completed ? 'bg-green-500' : 'bg-blue-500'} rounded-full group-hover:h-12 transition-all`} />
                             <div>
                                 <h4 className="font-bold text-slate-900 dark:text-white text-[15px]">{h.name}</h4>
                                 <p className="text-[11px] text-slate-400 font-bold uppercase tracking-wider mt-1">{h.interest}</p>
                             </div>
+                            {inst.completed && (
+                                <div className="ml-auto text-green-500">
+                                    <Icons.CheckCircle2 size={18} />
+                                </div>
+                            )}
                         </div>
                     )
                 })}
@@ -360,22 +395,52 @@ export default function Dashboard() {
         {/* BOTTOM ROW: WIDGETS (Bento Style) */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             
-            {/* Daily Score Card */}
-            <div className="bg-white dark:bg-dark-card backdrop-blur-xl rounded-[2.5rem] p-8 shadow-sm dark:shadow-dark-soft border border-slate-200 dark:border-dark-border relative overflow-hidden group">
+            {/* Weekly Progress Chart Card */}
+            <div className="bg-white dark:bg-dark-card backdrop-blur-xl rounded-[2.5rem] p-8 shadow-sm dark:shadow-dark-soft border border-slate-200 dark:border-dark-border relative overflow-hidden group col-span-1 md:col-span-2 lg:col-span-1">
                 <div className="absolute top-0 right-0 p-8 opacity-20 group-hover:opacity-100 transition-opacity">
-                    <TrendingUp className="text-blue-500" size={24} />
+                    <BarChart3 className="text-blue-500" size={24} />
                 </div>
-                <div className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-3">Daily Score</div>
-                <div className="text-6xl font-display font-bold text-slate-900 dark:text-white tracking-tighter">
-                    {dayScore}<span className="text-blue-500 text-2xl">.pts</span>
+                <div className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-3">Weekly Momentum</div>
+                <div className="h-40 w-full mt-4">
+                    <ResponsiveContainer width="100%" height="100%">
+                        <AreaChart data={weeklyProgressData}>
+                            <defs>
+                                <linearGradient id="colorScore" x1="0" y1="0" x2="0" y2="1">
+                                    <stop offset="5%" stopColor="#3B82F6" stopOpacity={0.3}/>
+                                    <stop offset="95%" stopColor="#3B82F6" stopOpacity={0}/>
+                                </linearGradient>
+                            </defs>
+                            <Tooltip 
+                                contentStyle={{ 
+                                    borderRadius: '16px', 
+                                    border: 'none', 
+                                    boxShadow: '0 10px 30px rgba(0,0,0,0.1)',
+                                    backgroundColor: 'rgba(255,255,255,0.9)',
+                                    backdropFilter: 'blur(10px)'
+                                }}
+                                labelStyle={{ fontWeight: 'bold', fontSize: '10px', color: '#64748b' }}
+                                itemStyle={{ fontSize: '12px', fontWeight: 'bold', color: '#3b82f6' }}
+                            />
+                            <Area 
+                                type="monotone" 
+                                dataKey="score" 
+                                stroke="#3B82F6" 
+                                strokeWidth={4} 
+                                fillOpacity={1} 
+                                fill="url(#colorScore)" 
+                                animationDuration={2000}
+                            />
+                        </AreaChart>
+                    </ResponsiveContainer>
                 </div>
-                <div className="mt-10 flex flex-col gap-3">
-                    <div className="flex justify-between text-[11px] font-bold text-slate-500 uppercase tracking-wider">
-                        <span>Progress</span>
-                        <span>{Math.round((dayScore/1000)*100)}%</span>
+                <div className="mt-4 flex justify-between items-center">
+                    <div className="text-2xl font-display font-bold text-slate-900 dark:text-white">
+                        {dayScore}<span className="text-blue-500 text-sm ml-1">pts today</span>
                     </div>
-                    <div className="h-2 w-full bg-slate-100 dark:bg-dark-border rounded-full overflow-hidden">
-                        <div className="h-full bg-blue-500 transition-all duration-1000 ease-out" style={{ width: `${(dayScore/1000)*100}%` }} />
+                    <div className="flex gap-1">
+                        {weeklyProgressData.map((d, i) => (
+                            <div key={i} className={`w-1.5 h-1.5 rounded-full ${d.score > 50 ? 'bg-blue-500' : 'bg-slate-200 dark:bg-slate-700'}`} />
+                        ))}
                     </div>
                 </div>
             </div>

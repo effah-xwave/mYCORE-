@@ -217,9 +217,9 @@ export default function App() {
   };
 
   const handleTrigger = async (instanceId: string, value?: number) => {
-    const [dateStr] = instanceId.split('_'); 
+    const [dateStr, habitId] = instanceId.split('_'); 
     let targetDate = dateStr;
-    let target = null;
+    let target: HabitInstance | null = null;
     
     // Search in current week structure
     for(const d in currentWeekInstances) {
@@ -228,6 +228,19 @@ export default function App() {
             targetDate = d;
             target = found;
             break;
+        }
+    }
+
+    // If not found, it might be a virtual instance
+    if (!target && habitId) {
+        const habit = habits.find(h => h.id === habitId);
+        if (habit) {
+            target = {
+                id: instanceId,
+                habitId: habit.id,
+                date: targetDate,
+                completed: false
+            };
         }
     }
     
@@ -242,9 +255,17 @@ export default function App() {
         }
         
         const newInstances = { ...currentWeekInstances };
-        newInstances[targetDate] = newInstances[targetDate].map(i => 
-            i.id === instanceId ? { ...i, completed: newState, value: value !== undefined ? value : i.value } : i
-        );
+        if (!newInstances[targetDate]) newInstances[targetDate] = [];
+
+        const existingIndex = newInstances[targetDate].findIndex(i => i.id === instanceId);
+        if (existingIndex >= 0) {
+            newInstances[targetDate] = newInstances[targetDate].map(i => 
+                i.id === instanceId ? { ...i, completed: newState, value: value !== undefined ? value : i.value } : i
+            );
+        } else {
+            newInstances[targetDate] = [...newInstances[targetDate], { ...target, completed: newState, value: value !== undefined ? value : target.value }];
+        }
+        
         setCurrentWeekInstances(newInstances);
 
         if (newState && user?.settings.notificationsEnabled) {

@@ -54,10 +54,17 @@ export default function ArticleReader({ onClose }: ArticleReaderProps) {
 
     if (readingHabit) {
       const today = new Date().toISOString().split('T')[0];
-      const instance = currentWeekInstances[today]?.find(i => i.habitId === readingHabit.id);
+      const existingInstance = currentWeekInstances[today]?.find(i => i.habitId === readingHabit.id);
       
-      if (instance && !instance.completed) {
-        await handleTrigger(instance.id);
+      if (existingInstance) {
+        if (!existingInstance.completed) {
+          await handleTrigger(existingInstance.id);
+          setIsCompleted(true);
+        }
+      } else {
+        // Use virtual ID
+        const virtualId = `${today}_${readingHabit.id}`;
+        await handleTrigger(virtualId);
         setIsCompleted(true);
       }
     }
