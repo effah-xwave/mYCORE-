@@ -45,11 +45,19 @@ export default function Auth({ onSuccess }: AuthProps) {
 
   const handleGoogle = async () => {
     setLoading(true);
+    setError('');
     try {
       const res = await AuthService.loginWithGoogle();
       onSuccess(res.email || '', res.user_metadata.name);
-    } catch (err) {
-      setError('Google Auth failed');
+    } catch (err: any) {
+      console.error("Google Auth Error:", err);
+      if (err.code === 'auth/popup-blocked') {
+        setError('Popup blocked by browser. Please allow popups for this site.');
+      } else if (err.code === 'auth/cancelled-popup-request') {
+        setError('Login cancelled.');
+      } else {
+        setError(err.message || 'Google Auth failed. Please try again.');
+      }
     } finally {
       setLoading(false);
     }

@@ -347,6 +347,13 @@ export default function App() {
         />
       ) : !isAuthenticated ? (
         <Auth onSuccess={handleLoginSuccess} />
+      ) : !user ? (
+        <div className="flex items-center justify-center h-screen bg-slate-50 dark:bg-dark-bg">
+           <div className="flex flex-col items-center gap-4">
+             <Loader2 className="animate-spin text-navy-900 dark:text-blue-600" size={40} />
+             <p className="text-slate-500 dark:text-slate-400 font-medium animate-pulse">Initializing your profile...</p>
+           </div>
+        </div>
       ) : !user?.onboarded ? (
         <Onboarding />
       ) : (

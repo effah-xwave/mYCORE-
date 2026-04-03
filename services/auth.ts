@@ -19,15 +19,29 @@ export const AuthService = {
   },
 
   login: async (email: string, password: string) => {
-    // Firebase doesn't support simple email/password without more setup, 
-    // but we can use Google Login as the primary method.
-    // For now, we'll keep the mock for email/password if needed, 
-    // but encourage Google Login.
-    throw new Error("Email/Password login is not configured. Please use Google Login.");
+    const user = await FirebaseAuthService.login(email, password);
+    return {
+      user: {
+        id: user.uid,
+        email: user.email,
+        user_metadata: {
+          name: user.displayName || user.email?.split('@')[0] || 'User'
+        }
+      }
+    };
   },
 
   signup: async (email: string, password: string) => {
-    throw new Error("Email/Password signup is not configured. Please use Google Login.");
+    const user = await FirebaseAuthService.signup(email, password);
+    return {
+      user: {
+        id: user.uid,
+        email: user.email,
+        user_metadata: {
+          name: user.displayName || user.email?.split('@')[0] || 'User'
+        }
+      }
+    };
   },
 
   loginWithGoogle: async () => {
@@ -42,7 +56,7 @@ export const AuthService = {
   },
 
   resetPassword: async (email: string) => {
-    // TODO: Implement Firebase reset password
+    await FirebaseAuthService.resetPassword(email);
     return true;
   },
 

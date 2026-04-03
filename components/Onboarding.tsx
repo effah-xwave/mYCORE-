@@ -156,7 +156,7 @@ export default function Onboarding() {
             </div>
             
             <div>
-                <h1 className="text-3xl font-bold text-slate-900 dark:text-white tracking-tight">Welcome, {user?.name.split(' ')[0]}</h1>
+                <h1 className="text-3xl font-bold text-slate-900 dark:text-white tracking-tight">Welcome, {user?.name?.split(' ')[0] || 'User'}</h1>
                 <p className="text-slate-500 dark:text-slate-400 text-lg mt-3 leading-relaxed">
                 Let's design a routine that unlocks your <br/> limitless potential.
                 </p>
