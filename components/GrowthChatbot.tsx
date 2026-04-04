@@ -12,15 +12,15 @@ interface Message {
   timestamp: Date;
 }
 
+// Initialize Gemini outside component to prevent re-initialization
+const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY || '' });
+
 export default function GrowthChatbot() {
-  const { user } = useApp();
+  const { user, habits, tasks } = useApp();
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
   const [isTyping, setIsTyping] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
-
-  // Initialize Gemini
-  const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY || '' });
 
   const scrollToBottom = () => {
     if (scrollRef.current) {
@@ -37,6 +37,17 @@ export default function GrowthChatbot() {
   const handleSend = async () => {
     if (!input.trim() || isTyping) return;
 
+    // Check for API key
+    if (!process.env.GEMINI_API_KEY) {
+      const errorMessage: Message = {
+        role: 'model',
+        text: "I'm sorry, but the AI Coach is currently unavailable because the API key is missing. Please contact support or check your settings.",
+        timestamp: new Date(),
+      };
+      setMessages(prev => [...prev, userMessage, errorMessage]);
+      return;
+    }
+
     const userMessage: Message = {
       role: 'user',
       text: input,
@@ -52,10 +63,16 @@ export default function GrowthChatbot() {
         model: "gemini-3-flash-preview",
         config: {
           systemInstruction: `You are a world-class growth and development coach named ${coachName}. 
-          Your goal is to help ${user?.name || 'the user'} achieve their full potential by providing actionable advice, psychological insights, and motivational support. 
-          You are empathetic, insightful, and always focused on practical steps for improvement. 
-          You can help with habit formation, productivity, emotional intelligence, and career growth.
-          Keep your responses concise but impactful. Use markdown for better readability.`,
+          Your goal is to help ${user?.name || 'the user'} achieve their full potential.
+          
+          CURRENT CONTEXT:
+          - User Interests: ${user?.interests?.join(', ') || 'General Growth'}
+          - Active Habits: ${habits.map(h => h.name).join(', ') || 'None yet'}
+          - Pending Tasks: ${tasks.filter(t => !t.completed).map(t => t.title).join(', ') || 'None'}
+          
+          Your advice should be actionable, psychological, and motivational. 
+          Reference their specific habits and tasks when relevant to provide personalized coaching.
+          Keep responses concise but impactful. Use markdown.`,
         },
         // We'll pass the history to the chat
         history: messages.map(m => ({
@@ -74,11 +91,20 @@ export default function GrowthChatbot() {
       };
 
       setMessages(prev => [...prev, botMessage]);
-    } catch (error) {
+    } catch (error: any) {
       console.error("Gemini Error:", error);
+      
+      let errorText = "I encountered an error while processing your request. Please check your connection and try again.";
+      
+      if (error.message?.includes("API key not valid")) {
+        errorText = "The AI Coach API key appears to be invalid. Please verify your configuration.";
+      } else if (error.message?.includes("quota")) {
+        errorText = "I've reached my message limit for now. Please try again in a little while.";
+      }
+
       const errorMessage: Message = {
         role: 'model',
-        text: "I encountered an error while processing your request. Please check your connection and try again.",
+        text: errorText,
         timestamp: new Date(),
       };
       setMessages(prev => [...prev, errorMessage]);

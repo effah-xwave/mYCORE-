@@ -69,6 +69,11 @@ export interface User {
     notificationsEnabled: boolean;
     screenTimeEnabled: boolean;
   };
+  permissions?: {
+    loc: boolean;
+    notif: boolean;
+    screen: boolean;
+  };
   coachName?: string;
   lastCoachRenameDate?: string; // ISO date string
 }

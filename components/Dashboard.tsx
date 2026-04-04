@@ -287,8 +287,13 @@ export default function Dashboard() {
     if (!habit) return;
 
     // Special case for Reading Habit
-    if (habit.name.toLowerCase().includes('read') || habit.interest.toLowerCase().includes('learn')) {
-        openArticleReader();
+    const isReadingHabit = habit.name.toLowerCase().includes('read') || 
+                          habit.interest.toLowerCase().includes('learn') ||
+                          habit.name.toLowerCase().includes('market') ||
+                          habit.name.toLowerCase().includes('finance');
+
+    if (isReadingHabit) {
+        openArticleReader(habit.name);
         return;
     }
 

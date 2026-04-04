@@ -21,6 +21,7 @@ import Dashboard from './components/Dashboard';
 import Interests from './components/Interests';
 import Analytics from './components/Analytics';
 import SettingsPage from './components/SettingsPage';
+import TutorialOverlay from './components/TutorialOverlay';
 import TasksPage from './components/TasksPage';
 import ProjectsPage from './components/ProjectsPage';
 import MapsAgent from './components/MapsAgent';
@@ -44,7 +45,7 @@ export interface AppContextType {
   completeOnboarding: (interests: InterestType[], finalHabits: Habit[], permissions: any) => Promise<void>;
   handleTrigger: (instanceId: string, value?: number) => Promise<void>;
   updateSettings: (settings: User['settings']) => Promise<void>;
-  resetApp: () => Promise<void>;
+  resetApp: (hard?: boolean) => Promise<void>;
   isAuthenticated: boolean;
   handleLoginSuccess: (email: string, name: string) => void;
   // Task Helpers
@@ -63,7 +64,9 @@ export interface AppContextType {
   // Coach
   updateCoachName: (newName: string) => Promise<void>;
   // Article Reader
-  openArticleReader: () => void;
+  openArticleReader: (query?: string) => void;
+  isTutorialOpen: boolean;
+  setIsTutorialOpen: (open: boolean) => void;
   // Theme
   theme: 'light' | 'dark';
   toggleTheme: () => void;
@@ -93,6 +96,8 @@ export default function App() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [showTransition, setShowTransition] = useState(false);
   const [isArticleReaderOpen, setIsArticleReaderOpen] = useState(false);
+  const [articleQuery, setArticleQuery] = useState<string | undefined>(undefined);
+  const [isTutorialOpen, setIsTutorialOpen] = useState(false);
 
   // Initialize Theme
   useEffect(() => {
@@ -147,15 +152,6 @@ export default function App() {
     setUser(u);
     
     if (u && u.onboarded) {
-      const h = await db.getHabits();
-      setHabits(h);
-
-      const t = await db.getTasks();
-      setTasks(t);
-
-      const p = await db.getProjects();
-      setProjects(p);
-      
       const weekDates = getWeekDays().map(formatDate);
       const instances = await db.getWeekInstances(weekDates);
       
@@ -168,6 +164,21 @@ export default function App() {
       setCurrentWeekInstances(grouped);
     }
   };
+
+  // Real-time Subscriptions
+  useEffect(() => {
+    if (user && user.onboarded) {
+      const unsubHabits = db.subscribeToHabits((h) => setHabits(h));
+      const unsubTasks = db.subscribeToTasks((t) => setTasks(t));
+      const unsubProjects = db.subscribeToProjects((p) => setProjects(p));
+
+      return () => {
+        unsubHabits();
+        unsubTasks();
+        unsubProjects();
+      };
+    }
+  }, [user?.id, user?.onboarded]);
 
   // Check for Reminders
   useEffect(() => {
@@ -281,17 +292,24 @@ export default function App() {
     }
   };
 
-  const resetApp = async () => {
-    await AuthService.logout();
-    await db.reset();
-    setIsAuthenticated(false);
-    setUser(null);
-    setHabits([]);
-    setTasks([]);
-    setProjects([]);
-    setCurrentWeekInstances({});
-    setActiveTab('dashboard');
-    setShowTransition(false);
+  const resetApp = async (hard: boolean = false) => {
+    if (hard) {
+      await db.resetUser();
+      // After resetUser, the user object will be updated via subscription or manually
+      const u = await db.getUser();
+      setUser(u);
+    } else {
+      await AuthService.logout();
+      await db.reset();
+      setIsAuthenticated(false);
+      setUser(null);
+      setHabits([]);
+      setTasks([]);
+      setProjects([]);
+      setCurrentWeekInstances({});
+      setActiveTab('dashboard');
+      setShowTransition(false);
+    }
   }
 
   // --- TASK ACTIONS ---
@@ -353,7 +371,8 @@ export default function App() {
     await refreshData();
   };
 
-  const openArticleReader = () => {
+  const openArticleReader = (query?: string) => {
+    setArticleQuery(query);
     setIsArticleReaderOpen(true);
   };
 
@@ -372,12 +391,16 @@ export default function App() {
   const contextValue = { 
     user, habits, currentWeekInstances, tasks, projects, refreshData, isLoading, 
     activeTab, setActiveTab, completeOnboarding, handleTrigger, 
-    updateSettings, resetApp, isAuthenticated, handleLoginSuccess,
+    updateSettings, 
+    resetApp: (hard?: boolean) => resetApp(hard),
+    isAuthenticated, handleLoginSuccess,
     addTask, updateTask, toggleTask, addProject, updateProject, deleteProject, deleteTask, 
     addHabit, deleteHabit, toggleHabitFavorite,
     getInstancesForRange,
     updateCoachName,
     openArticleReader,
+    isTutorialOpen,
+    setIsTutorialOpen,
     theme, toggleTheme
   };
 
@@ -470,7 +493,7 @@ export default function App() {
 
              <div className="p-6 border-t border-slate-100 dark:border-dark-border">
                 <button 
-                  onClick={resetApp}
+                  onClick={() => resetApp(false)}
                   className="w-full flex items-center gap-3 px-4 py-3.5 rounded-2xl text-slate-500 hover:bg-red-50 hover:text-red-600 dark:hover:bg-red-900/10 transition-all font-medium"
                 >
                   <LogOut size={22} />
@@ -537,7 +560,7 @@ export default function App() {
              </header>
 
              {/* SCROLLABLE PAGE CONTENT */}
-             <main className="flex-1 overflow-y-auto p-4 md:p-8 scroll-smooth">
+             <main className="flex-1 overflow-y-auto p-4 md:p-8 pb-24 md:pb-8 scroll-smooth">
                 <div className="max-w-7xl mx-auto animate-fade-in">
                   {activeTab === 'dashboard' && <Dashboard />}
                   {activeTab === 'growth' && <GrowthChatbot />}
@@ -550,6 +573,32 @@ export default function App() {
                   {activeTab === 'settings' && <SettingsPage />}
                 </div>
              </main>
+
+             <AnimatePresence>
+               {isTutorialOpen && (
+                 <TutorialOverlay onClose={() => setIsTutorialOpen(false)} />
+               )}
+             </AnimatePresence>
+          </div>
+
+          {/* MOBILE BOTTOM NAVIGATION */}
+          <div className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-white/80 dark:bg-dark-card/80 backdrop-blur-xl border-t border-slate-200 dark:border-dark-border px-6 py-3 pb-safe flex items-center justify-between shadow-2xl">
+            {[
+              { id: 'dashboard', icon: LayoutDashboard, label: 'Home' },
+              { id: 'tasks', icon: CheckSquare, label: 'Tasks' },
+              { id: 'growth', icon: Sparkles, label: 'Coach' },
+              { id: 'analytics', icon: BarChart2, label: 'Stats' },
+              { id: 'settings', icon: Settings, label: 'More' },
+            ].map((item) => (
+              <button
+                key={item.id}
+                onClick={() => setActiveTab(item.id as any)}
+                className={`flex flex-col items-center gap-1 transition-all ${activeTab === item.id ? 'text-blue-500 scale-110' : 'text-slate-400 dark:text-slate-500'}`}
+              >
+                <item.icon size={20} className={activeTab === item.id ? 'fill-blue-500/10' : ''} />
+                <span className="text-[9px] font-bold uppercase tracking-widest">{item.label}</span>
+              </button>
+            ))}
           </div>
 
           {/* MOBILE NAVIGATION DRAWER */}
@@ -583,13 +632,16 @@ export default function App() {
                       ))}
                    </nav>
                    <div className="mt-auto pt-6 border-t border-slate-100 dark:border-dark-border">
-                      <button onClick={resetApp} className="flex items-center gap-3 text-red-500 font-medium"><LogOut size={20}/> Logout</button>
+                      <button onClick={() => resetApp(false)} className="flex items-center gap-3 text-red-500 font-medium"><LogOut size={20}/> Logout</button>
                    </div>
                 </div>
              </div>
           )}
           {isArticleReaderOpen && (
-            <ArticleReader onClose={() => setIsArticleReaderOpen(false)} />
+            <ArticleReader 
+              query={articleQuery}
+              onClose={() => setIsArticleReaderOpen(false)} 
+            />
           )}
         </div>
       )}

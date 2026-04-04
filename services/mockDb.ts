@@ -50,5 +50,10 @@ export const db = {
   
   deleteProject: (projectId: string) => FirebaseDBService.deleteProject(projectId),
   
-  reset: () => FirebaseDBService.reset()
+  subscribeToHabits: (callback: (habits: Habit[]) => void) => FirebaseDBService.subscribeToHabits(callback),
+  subscribeToTasks: (callback: (tasks: Task[]) => void) => FirebaseDBService.subscribeToTasks(callback),
+  subscribeToProjects: (callback: (projects: Project[]) => void) => FirebaseDBService.subscribeToProjects(callback),
+  
+  reset: () => FirebaseDBService.reset(),
+  resetUser: () => FirebaseDBService.resetUser()
 };

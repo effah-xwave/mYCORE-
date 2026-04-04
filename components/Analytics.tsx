@@ -85,12 +85,21 @@ export default function Analytics() {
   const calculateGrowth = () => {
     if (rangeData.length < 2) return { monthly: 0, annually: 0 };
     
-    // Simple mock growth calculation based on current data trends
-    // In a real app, this would compare current month/year to previous
-    const monthlyGrowth = 12.4; // Mock value
-    const annuallyGrowth = 45.2; // Mock value
+    // Calculate real growth based on the current view's data
+    // Compare the last half of the data to the first half
+    const mid = Math.floor(rangeData.length / 2);
+    const firstHalf = rangeData.slice(0, mid);
+    const secondHalf = rangeData.slice(mid);
     
-    return { monthly: monthlyGrowth, annually: annuallyGrowth };
+    const firstAvg = firstHalf.reduce((acc, curr) => acc + curr.rate, 0) / (firstHalf.length || 1);
+    const secondAvg = secondHalf.reduce((acc, curr) => acc + curr.rate, 0) / (secondHalf.length || 1);
+    
+    const growthRate = firstAvg === 0 ? secondAvg : ((secondAvg - firstAvg) / firstAvg) * 100;
+    
+    return { 
+      current: Math.round(growthRate * 10) / 10,
+      label: view === 'weekly' ? 'vs last week' : view === 'monthly' ? 'vs last month' : 'vs last year'
+    };
   };
 
   const growth = calculateGrowth();
@@ -134,15 +143,15 @@ export default function Analytics() {
            </div>
         </div>
         <div className="bg-white dark:bg-dark-card backdrop-blur-xl p-8 rounded-[2.5rem] shadow-sm dark:shadow-dark-soft border border-slate-200 dark:border-dark-border group transition-all hover:scale-[1.02]">
-           <div className="text-slate-400 dark:text-slate-500 text-[10px] font-bold uppercase tracking-[0.2em] mb-4">Monthly Growth</div>
-           <div className="text-5xl font-display font-bold text-slate-900 dark:text-white tracking-tighter">+{growth.monthly}%</div>
-           <div className="mt-4 flex items-center gap-2 text-green-500 text-xs font-bold uppercase tracking-widest">
-              Accelerating
+           <div className="text-slate-400 dark:text-slate-500 text-[10px] font-bold uppercase tracking-[0.2em] mb-4">Momentum</div>
+           <div className="text-5xl font-display font-bold text-slate-900 dark:text-white tracking-tighter">{(growth.current ?? 0) > 0 ? '+' : ''}{growth.current ?? 0}%</div>
+           <div className={`mt-4 flex items-center gap-2 ${(growth.current ?? 0) >= 0 ? 'text-green-500' : 'text-red-500'} text-xs font-bold uppercase tracking-widest`}>
+              {(growth.current ?? 0) >= 0 ? <TrendingUp size={14} /> : <Activity size={14} />} {growth.label}
            </div>
         </div>
         <div className="bg-white dark:bg-dark-card backdrop-blur-xl p-8 rounded-[2.5rem] shadow-sm dark:shadow-dark-soft border border-slate-200 dark:border-dark-border group transition-all hover:scale-[1.02]">
-           <div className="text-slate-400 dark:text-slate-500 text-[10px] font-bold uppercase tracking-[0.2em] mb-4">Annual Growth</div>
-           <div className="text-5xl font-display font-bold text-slate-900 dark:text-white tracking-tighter">+{growth.annually}%</div>
+           <div className="text-slate-400 dark:text-slate-500 text-[10px] font-bold uppercase tracking-[0.2em] mb-4">Focus Score</div>
+           <div className="text-5xl font-display font-bold text-slate-900 dark:text-white tracking-tighter">A+</div>
            <div className="mt-4 flex items-center gap-2 text-amber-500 text-xs font-bold uppercase tracking-widest">
               Compound Effect
            </div>

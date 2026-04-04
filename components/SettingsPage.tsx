@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import { useApp } from '../App';
-import { LogOut, Download, Trash2, ChevronRight, Shield, Sparkles, Edit2, Check, X } from 'lucide-react';
+import { LogOut, Download, Trash2, ChevronRight, Shield, Sparkles, Edit2, Check, X, HelpCircle, RefreshCcw } from 'lucide-react';
 
 export default function SettingsPage() {
-  const { user, resetApp, updateSettings, updateCoachName } = useApp();
+  const { user, resetApp, updateSettings, updateCoachName, setIsTutorialOpen } = useApp();
   const [isRenamingCoach, setIsRenamingCoach] = useState(false);
   const [newCoachName, setNewCoachName] = useState(user?.coachName || '');
   const [renameError, setRenameError] = useState('');
@@ -50,6 +50,12 @@ export default function SettingsPage() {
             ...user.settings,
             notificationsEnabled: !user.settings.notificationsEnabled
         });
+    }
+  };
+
+  const handleHardReset = async () => {
+    if (confirm("Are you sure you want to completely reset your profile? This will clear all your habits, tasks, and interests, and take you back to onboarding. This cannot be undone.")) {
+      await resetApp(true);
     }
   };
 
@@ -126,6 +132,16 @@ export default function SettingsPage() {
                 )}
             </div>
 
+            <button 
+                onClick={() => setIsTutorialOpen(true)}
+                className="w-full flex items-center justify-between p-7 hover:bg-slate-50 dark:hover:bg-white/5 border-b border-slate-100 dark:border-white/5 transition-all group"
+            >
+                <span className="flex items-center gap-4 font-bold text-slate-700 dark:text-slate-200 tracking-tight group-hover:translate-x-1 transition-transform">
+                    <HelpCircle size={20} className="text-blue-500" /> App Tutorial
+                </span>
+                <ChevronRight size={20} className="text-slate-300 group-hover:text-blue-500 transition-colors" />
+            </button>
+
             <button className="w-full flex items-center justify-between p-7 hover:bg-slate-50 dark:hover:bg-white/5 border-b border-slate-100 dark:border-white/5 transition-all group">
                 <span className="font-bold text-slate-700 dark:text-slate-200 tracking-tight group-hover:translate-x-1 transition-transform">Edit Habits</span>
                 <ChevronRight size={20} className="text-slate-300 group-hover:text-blue-500 transition-colors" />
@@ -159,8 +175,14 @@ export default function SettingsPage() {
                         Data is stored locally on your device. We do not track your location history on our servers. Triggers are processed on-device.
                     </p>
                 </div>
-                <button onClick={resetApp} className="w-full flex items-center gap-4 p-7 text-red-500 hover:bg-red-50 dark:hover:bg-red-900/10 transition-all font-bold group">
+                <button onClick={() => resetApp(false)} className="w-full flex items-center gap-4 p-7 text-red-500 hover:bg-red-50 dark:hover:bg-red-900/10 transition-all font-bold group">
                     <LogOut size={20} className="group-hover:-translate-x-1 transition-transform" /> Sign Out & Reset Demo
+                </button>
+                <button 
+                    onClick={handleHardReset}
+                    className="w-full flex items-center gap-4 p-7 text-red-500 hover:bg-red-50 dark:hover:bg-red-900/10 transition-all border-t border-slate-100 dark:border-white/5 font-bold group"
+                >
+                    <RefreshCcw size={20} className="group-hover:rotate-180 transition-transform duration-500" /> Hard Reset Profile
                 </button>
                 <button className="w-full flex items-center gap-4 p-7 text-red-500 hover:bg-red-50 dark:hover:bg-red-900/10 transition-all border-t border-slate-100 dark:border-white/5 font-bold group">
                     <Trash2 size={20} className="group-hover:scale-110 transition-transform" /> Delete Account

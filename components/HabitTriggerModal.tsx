@@ -1,7 +1,8 @@
 
 import React, { useState, useEffect } from 'react';
 import { Habit, TriggerType } from '../types';
-import { MapPin, Smartphone, Zap, CheckCircle2, Loader2, TrendingUp, Search, Target } from 'lucide-react';
+import { MapPin, Smartphone, Zap, CheckCircle2, Loader2, TrendingUp, Search, Target, ShieldCheck } from 'lucide-react';
+import { useApp } from '../App';
 
 interface Props {
   habit: Habit;
@@ -11,9 +12,12 @@ interface Props {
 }
 
 export default function HabitTriggerModal({ habit, onClose, onConfirm, initialValue }: Props) {
+  const { user } = useApp();
   const [step, setStep] = useState(habit.goal ? 'log_progress' : 'simulate'); // log_progress -> simulate -> screen_time_success | location_success -> verifying -> success
   const [inputValue, setInputValue] = useState(initialValue !== undefined ? String(initialValue) : '');
   const [stockSim, setStockSim] = useState({ price: 0, change: 0, loading: false, done: false });
+  const [permissionStep, setPermissionStep] = useState<'idle' | 'requesting' | 'granted'>('idle');
+  const [marketNews, setMarketNews] = useState<{title: string, source: string}[]>([]);
 
   // Auto transition for Location/App Open simulation
   useEffect(() => {
@@ -29,8 +33,41 @@ export default function HabitTriggerModal({ habit, onClose, onConfirm, initialVa
     }
   }, [step, onConfirm, inputValue, habit.triggerType]);
 
+  // Load market news if applicable
+  useEffect(() => {
+    if (habit.name.toLowerCase().includes('market') || habit.name.toLowerCase().includes('finance')) {
+        setMarketNews([
+            { title: "S&P 500 hits new record high as tech rally continues", source: "Market Terminal" },
+            { title: "Federal Reserve hints at potential rate cuts in Q3", source: "Financial Times" },
+            { title: "Global markets react to new trade agreements", source: "Bloomberg" }
+        ]);
+    }
+  }, [habit.name]);
+
   const handleAction = () => {
-    setStep('verifying');
+    const hasPermission = (habit.triggerType === TriggerType.SCREEN_TIME && user?.permissions?.screen) ||
+                          (habit.triggerType === TriggerType.LOCATION && user?.permissions?.loc);
+
+    if (habit.triggerType === TriggerType.SCREEN_TIME || habit.triggerType === TriggerType.LOCATION) {
+        if (hasPermission) {
+            setPermissionStep('granted');
+            setTimeout(() => {
+                setPermissionStep('idle');
+                setStep('verifying');
+            }, 1000);
+        } else {
+            setPermissionStep('requesting');
+            setTimeout(() => {
+                setPermissionStep('granted');
+                setTimeout(() => {
+                    setPermissionStep('idle');
+                    setStep('verifying');
+                }, 1000);
+            }, 1500);
+        }
+    } else {
+        setStep('verifying');
+    }
   };
 
   const handleStockCheck = () => {
@@ -49,6 +86,39 @@ export default function HabitTriggerModal({ habit, onClose, onConfirm, initialVa
   };
 
   const renderContent = () => {
+    if (permissionStep === 'requesting') {
+        return (
+            <div className="text-center space-y-6 py-4">
+                <div className="w-16 h-16 bg-blue-50 dark:bg-blue-500/10 rounded-full flex items-center justify-center mx-auto text-blue-600 dark:text-blue-400 animate-bounce">
+                    <ShieldCheck size={32} />
+                </div>
+                <h3 className="font-bold text-xl text-slate-900 dark:text-white">Requesting Permission</h3>
+                <p className="text-slate-500 dark:text-slate-400 text-sm">
+                    Allow myCORE to access {habit.triggerType === TriggerType.LOCATION ? 'Location' : 'Screen Time'} data to automate your habits.
+                </p>
+                <div className="flex gap-3">
+                    <div className="flex-1 h-1 bg-slate-100 dark:bg-dark-bg rounded-full overflow-hidden">
+                        <div className="h-full bg-blue-500 animate-progress-fast" />
+                    </div>
+                </div>
+            </div>
+        );
+    }
+
+    if (permissionStep === 'granted') {
+        return (
+            <div className="text-center space-y-4 py-4 animate-scale-in">
+                <div className="w-16 h-16 bg-green-50 dark:bg-green-500/10 rounded-full flex items-center justify-center mx-auto text-green-600 dark:text-green-400">
+                    <CheckCircle2 size={32} />
+                </div>
+                <h3 className="font-bold text-xl text-slate-900 dark:text-white">Permission Granted</h3>
+                <p className="text-slate-500 dark:text-slate-400 text-sm">
+                    Access established. Syncing data...
+                </p>
+            </div>
+        );
+    }
+
     // 1. MANUAL GOAL LOGGING
     if (step === 'log_progress' && habit.goal) {
         return (
@@ -229,6 +299,20 @@ export default function HabitTriggerModal({ habit, onClose, onConfirm, initialVa
                                 <div className="text-green-500 dark:text-green-400 font-semibold text-sm flex items-center justify-center gap-1">
                                     <TrendingUp size={14} /> +{stockSim.change.toFixed(2)}%
                                 </div>
+                            </div>
+                        )}
+                        
+                        {marketNews.length > 0 && (
+                            <div className="mt-4 text-left space-y-2 animate-fade-in">
+                                <h4 className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest px-1">Latest Market Feed</h4>
+                                {marketNews.map((news, i) => (
+                                    <div key={i} className="p-3 bg-slate-50 dark:bg-dark-bg/50 rounded-xl border border-slate-100 dark:border-dark-border">
+                                        <p className="text-xs font-semibold text-slate-700 dark:text-slate-300 leading-snug">{news.title}</p>
+                                        <div className="flex items-center gap-1 mt-1">
+                                            <span className="text-[9px] text-blue-500 font-bold">{news.source}</span>
+                                        </div>
+                                    </div>
+                                ))}
                             </div>
                         )}
                         

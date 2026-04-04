@@ -391,6 +391,37 @@ export const FirebaseDBService = {
     }
   },
 
+  // --- SUBSCRIPTIONS ---
+  subscribeToHabits(callback: (habits: Habit[]) => void) {
+    const userId = auth.currentUser?.uid;
+    if (!userId) return () => {};
+    const path = `users/${userId}/habits`;
+    const q = query(collection(db, path));
+    return onSnapshot(q, (snapshot) => {
+      callback(snapshot.docs.map(doc => doc.data() as Habit));
+    }, (error) => handleFirestoreError(error, OperationType.LIST, path));
+  },
+
+  subscribeToTasks(callback: (tasks: Task[]) => void) {
+    const userId = auth.currentUser?.uid;
+    if (!userId) return () => {};
+    const path = `users/${userId}/tasks`;
+    const q = query(collection(db, path));
+    return onSnapshot(q, (snapshot) => {
+      callback(snapshot.docs.map(doc => doc.data() as Task));
+    }, (error) => handleFirestoreError(error, OperationType.LIST, path));
+  },
+
+  subscribeToProjects(callback: (projects: Project[]) => void) {
+    const userId = auth.currentUser?.uid;
+    if (!userId) return () => {};
+    const path = `users/${userId}/projects`;
+    const q = query(collection(db, path));
+    return onSnapshot(q, (snapshot) => {
+      callback(snapshot.docs.map(doc => doc.data() as Project));
+    }, (error) => handleFirestoreError(error, OperationType.LIST, path));
+  },
+
   // --- SUGGESTIONS ---
   getSuggestions(interests: InterestType[]): Habit[] {
     const SUGGESTED_HABITS: Habit[] = [
@@ -414,5 +445,24 @@ export const FirebaseDBService = {
     // In Firebase, we don't usually clear the whole DB from the client
     // But we can sign out
     await auth.signOut();
+  },
+
+  async resetUser(): Promise<void> {
+    const userId = auth.currentUser?.uid;
+    if (!userId) return;
+    const path = `users/${userId}`;
+    try {
+      // Reset onboarding status and clear basic info
+      await updateDoc(doc(db, path), {
+        onboarded: false,
+        interests: [],
+        coachName: 'CORE AI Coach'
+      });
+      
+      // Note: Subcollections like habits, tasks, projects are not deleted here 
+      // but the user will be forced to re-onboard which will overwrite/add new ones.
+    } catch (error) {
+      handleFirestoreError(error, OperationType.UPDATE, path);
+    }
   }
 };

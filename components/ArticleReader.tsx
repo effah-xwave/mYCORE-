@@ -7,9 +7,10 @@ import { useApp } from '../App';
 
 interface ArticleReaderProps {
   onClose: () => void;
+  query?: string;
 }
 
-export default function ArticleReader({ onClose }: ArticleReaderProps) {
+export default function ArticleReader({ onClose, query }: ArticleReaderProps) {
   const { habits, currentWeekInstances, handleTrigger } = useApp();
   const [articles, setArticles] = useState<Article[]>([]);
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -23,7 +24,7 @@ export default function ArticleReader({ onClose }: ArticleReaderProps) {
   useEffect(() => {
     const loadArticles = async () => {
       setIsLoading(true);
-      const fetched = await ArticleService.fetchRandomArticles(5);
+      const fetched = await ArticleService.fetchRandomArticles(5, query);
       setArticles(fetched);
       setIsLoading(false);
     };
