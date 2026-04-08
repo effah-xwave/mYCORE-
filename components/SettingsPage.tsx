@@ -3,10 +3,28 @@ import { useApp } from '../App';
 import { LogOut, Download, Trash2, ChevronRight, Shield, Sparkles, Edit2, Check, X, HelpCircle, RefreshCcw } from 'lucide-react';
 
 export default function SettingsPage() {
-  const { user, resetApp, updateSettings, updateCoachName, setIsTutorialOpen } = useApp();
+  const { user, resetApp, updateSettings, updateCoachName, updateUserProfile, setIsTutorialOpen } = useApp();
   const [isRenamingCoach, setIsRenamingCoach] = useState(false);
+  const [isEditingProfile, setIsEditingProfile] = useState(false);
   const [newCoachName, setNewCoachName] = useState(user?.coachName || '');
+  const [customPhotoURL, setCustomPhotoURL] = useState(user?.photoURL || '');
   const [renameError, setRenameError] = useState('');
+
+  const avatarOptions = [
+    'https://api.dicebear.com/7.x/avataaars/svg?seed=Felix',
+    'https://api.dicebear.com/7.x/avataaars/svg?seed=Aneka',
+    'https://api.dicebear.com/7.x/avataaars/svg?seed=Jack',
+    'https://api.dicebear.com/7.x/avataaars/svg?seed=Mimi',
+    'https://api.dicebear.com/7.x/avataaars/svg?seed=Casper',
+    'https://api.dicebear.com/7.x/avataaars/svg?seed=Toby',
+    'https://api.dicebear.com/7.x/avataaars/svg?seed=Luna',
+    'https://api.dicebear.com/7.x/avataaars/svg?seed=Oliver'
+  ];
+
+  const handleUpdatePhoto = async (url: string) => {
+    await updateUserProfile({ photoURL: url });
+    setCustomPhotoURL(url);
+  };
 
   const canRenameCoach = () => {
     if (!user?.lastCoachRenameDate) return true;
@@ -69,14 +87,66 @@ export default function SettingsPage() {
       <div className="space-y-8">
         
         {/* PROFILE CARD */}
-        <div className="bg-white dark:bg-dark-card backdrop-blur-xl p-8 rounded-[2.5rem] shadow-sm dark:shadow-dark-soft border border-slate-200 dark:border-dark-border flex items-center gap-6 group transition-all hover:scale-[1.02]">
-            <div className="w-20 h-20 rounded-[2rem] bg-slate-900 dark:bg-blue-600 text-white flex items-center justify-center text-3xl font-display font-bold shadow-xl shadow-blue-500/20 group-hover:rotate-3 transition-transform">
-                {user?.name.charAt(0)}
+        <div className="bg-white dark:bg-dark-card backdrop-blur-xl p-8 rounded-[2.5rem] shadow-sm dark:shadow-dark-soft border border-slate-200 dark:border-dark-border flex flex-col gap-8 group transition-all">
+            <div className="flex items-center gap-6">
+                <div className="relative group/avatar">
+                    <div className="w-24 h-24 rounded-[2rem] bg-slate-900 dark:bg-blue-600 text-white flex items-center justify-center text-3xl font-display font-bold shadow-xl shadow-blue-500/20 group-hover/avatar:rotate-3 transition-transform overflow-hidden">
+                        {user?.photoURL ? (
+                            <img src={user.photoURL} alt={user.name} className="w-full h-full object-cover" referrerPolicy="no-referrer" />
+                        ) : (
+                            user?.name.charAt(0)
+                        )}
+                    </div>
+                    <button 
+                        onClick={() => setIsEditingProfile(!isEditingProfile)}
+                        className="absolute -bottom-2 -right-2 w-10 h-10 bg-white dark:bg-dark-card rounded-xl shadow-lg border border-slate-200 dark:border-dark-border flex items-center justify-center text-slate-500 hover:text-blue-500 transition-all"
+                    >
+                        <Edit2 size={18} />
+                    </button>
+                </div>
+                <div>
+                    <h3 className="font-display font-bold text-3xl text-slate-900 dark:text-white tracking-tight">{user?.name}</h3>
+                    <p className="text-slate-400 dark:text-slate-500 text-sm font-medium">Pro Member • Growth Nexis Global</p>
+                </div>
             </div>
-            <div>
-                <h3 className="font-display font-bold text-2xl text-slate-900 dark:text-white tracking-tight">{user?.name}</h3>
-                <p className="text-slate-400 dark:text-slate-500 text-sm font-medium">Pro Member • Growth Nexis Global</p>
-            </div>
+
+            {isEditingProfile && (
+                <div className="animate-fade-in space-y-6 pt-6 border-t border-slate-100 dark:border-white/5">
+                    <div className="space-y-4">
+                        <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Select Avatar</label>
+                        <div className="grid grid-cols-4 sm:grid-cols-8 gap-4">
+                            {avatarOptions.map((url) => (
+                                <button 
+                                    key={url}
+                                    onClick={() => handleUpdatePhoto(url)}
+                                    className={`w-12 h-12 rounded-xl overflow-hidden border-2 transition-all ${user?.photoURL === url ? 'border-blue-500 scale-110 shadow-glow' : 'border-transparent hover:border-slate-200 dark:hover:border-white/20'}`}
+                                >
+                                    <img src={url} alt="Avatar Option" className="w-full h-full object-cover" referrerPolicy="no-referrer" />
+                                </button>
+                            ))}
+                        </div>
+                    </div>
+
+                    <div className="space-y-4">
+                        <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Custom Image URL</label>
+                        <div className="flex gap-2">
+                            <input 
+                                type="text"
+                                value={customPhotoURL}
+                                onChange={(e) => setCustomPhotoURL(e.target.value)}
+                                className="flex-1 bg-slate-50 dark:bg-dark-bg border border-slate-200 dark:border-dark-border rounded-xl px-4 py-3 text-sm font-bold outline-none focus:border-blue-500 transition-all"
+                                placeholder="https://example.com/image.jpg"
+                            />
+                            <button 
+                                onClick={() => handleUpdatePhoto(customPhotoURL)}
+                                className="px-6 bg-slate-900 dark:bg-blue-600 text-white rounded-xl font-bold text-xs uppercase tracking-widest shadow-lg hover:scale-105 active:scale-95 transition-all"
+                            >
+                                Apply
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
 
         {/* OPTIONS */}

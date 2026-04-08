@@ -11,7 +11,8 @@ import { NotificationService } from './services/notificationService';
 // Icons
 import { 
   LayoutDashboard, Compass, BarChart2, Settings, Loader2, CheckSquare, 
-  LogOut, Sun, Moon, Search, Bell, Menu, X, Briefcase, Navigation, Sparkles, Zap
+  LogOut, Sun, Moon, Search, Bell, Menu, X, Briefcase, Navigation, Sparkles, Zap,
+  Activity, Calendar
 } from 'lucide-react';
 
 // Components
@@ -63,6 +64,7 @@ export interface AppContextType {
   getInstancesForRange: (startDate: string, endDate: string) => Promise<HabitInstance[]>;
   // Coach
   updateCoachName: (newName: string) => Promise<void>;
+  updateUserProfile: (updates: Partial<User>) => Promise<void>;
   // Article Reader
   openArticleReader: (query?: string) => void;
   isTutorialOpen: boolean;
@@ -371,6 +373,11 @@ export default function App() {
     await refreshData();
   };
 
+  const updateUserProfile = async (updates: Partial<User>) => {
+    await db.updateUserProfile(updates);
+    await refreshData();
+  };
+
   const openArticleReader = (query?: string) => {
     setArticleQuery(query);
     setIsArticleReaderOpen(true);
@@ -398,6 +405,7 @@ export default function App() {
     addHabit, deleteHabit, toggleHabitFavorite,
     getInstancesForRange,
     updateCoachName,
+    updateUserProfile,
     openArticleReader,
     isTutorialOpen,
     setIsTutorialOpen,
@@ -433,135 +441,108 @@ export default function App() {
           </div>
 
           {/* SIDEBAR NAVIGATION (Desktop) */}
-          <aside className="hidden md:flex flex-col w-20 lg:w-72 bg-white dark:bg-dark-card backdrop-blur-2xl border-r border-slate-200 dark:border-dark-border transition-all duration-300 z-50">
-             <div className="h-20 flex items-center justify-center lg:justify-start lg:px-8 border-b border-slate-100 dark:border-dark-border/50">
+          <aside className="hidden md:flex flex-col w-20 bg-habithub-sidebar/50 backdrop-blur-3xl border-r border-white/5 transition-all duration-300 z-50">
+             <div className="h-20 flex items-center justify-center border-b border-white/5">
                 <div className="relative group flex items-center gap-3">
-                  <div className="w-10 h-10 bg-white dark:bg-dark-card rounded-xl flex items-center justify-center shadow-glow transition-all group-hover:scale-110 overflow-hidden border border-slate-200 dark:border-dark-border">
-                    <img 
-                      src="https://drive.google.com/thumbnail?id=1Cn2hUpBxHLJ_6QmG8JYxJ9mjAgpDJa5f&sz=w128" 
-                      alt="myCORE" 
-                      className="w-8 h-8 object-contain"
-                      referrerPolicy="no-referrer"
-                      onError={(e) => { e.currentTarget.style.display = 'none'; e.currentTarget.nextElementSibling?.classList.remove('hidden'); }}
-                    />
-                    <span className="hidden text-[10px] font-bold text-slate-900 dark:text-white">CORE</span>
+                  <div className="w-10 h-10 bg-habithub-purple/20 rounded-xl flex items-center justify-center shadow-glow-purple transition-all group-hover:scale-110 overflow-hidden border border-habithub-purple/30">
+                    <Sparkles className="text-habithub-purple" size={20} />
                   </div>
-                  <span className="hidden lg:block font-display font-bold text-2xl tracking-tight text-slate-900 dark:text-white">myCORE</span>
                 </div>
              </div>
 
-             <nav className="flex-1 py-8 flex flex-col gap-1.5 px-4">
+             <nav className="flex-1 py-8 flex flex-col items-center gap-4 px-2">
                 {[
                   { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
-                  { id: 'growth', label: 'Growth AI', icon: Sparkles },
-                  { id: 'optimize', label: 'Optimize', icon: Zap },
-                  { id: 'projects', label: 'Projects', icon: Briefcase },
-                  { id: 'tasks', label: 'Tasks', icon: CheckSquare },
-                  { id: 'navigator', label: 'Navigator', icon: Navigation },
-                  { id: 'interests', label: 'Interests', icon: Compass },
+                  { id: 'growth', label: 'Activity', icon: Activity },
+                  { id: 'tasks', label: 'Calendar', icon: Calendar },
                   { id: 'analytics', label: 'Analytics', icon: BarChart2 },
+                  { id: 'navigator', label: 'Support', icon: Navigation },
                   { id: 'settings', label: 'Settings', icon: Settings },
                 ].map(tab => (
                   <button
                     key={tab.id}
                     onClick={() => setActiveTab(tab.id)}
                     className={`
-                      relative group flex items-center gap-3 px-4 py-3.5 rounded-2xl transition-all duration-300
+                      relative group flex items-center justify-center w-12 h-12 rounded-2xl transition-all duration-300
                       ${activeTab === tab.id 
-                        ? 'bg-blue-600 text-white shadow-lg shadow-blue-500/20' 
-                        : 'text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-white/5 hover:text-slate-900 dark:hover:text-white'
+                        ? 'bg-habithub-accent text-white shadow-glow-blue' 
+                        : 'text-slate-500 hover:bg-white/5 hover:text-white'
                       }
                     `}
                   >
                     <tab.icon size={22} strokeWidth={activeTab === tab.id ? 2.5 : 2} className="shrink-0" />
-                    <span className="hidden lg:block font-semibold text-[15px]">{tab.label}</span>
                     
-                    {/* Floating Tooltip for Collapsed State */}
-                    <div className="lg:hidden absolute left-full ml-4 px-3 py-2 bg-slate-900 dark:bg-dark-card text-white text-xs font-bold rounded-xl opacity-0 group-hover:opacity-100 pointer-events-none transition-all duration-200 whitespace-nowrap z-[100] shadow-2xl border border-slate-200 dark:border-dark-border translate-x-[-10px] group-hover:translate-x-0">
+                    {/* Floating Tooltip */}
+                    <div className="absolute left-full ml-4 px-3 py-2 bg-slate-900 text-white text-xs font-bold rounded-xl opacity-0 group-hover:opacity-100 pointer-events-none transition-all duration-200 whitespace-nowrap z-[100] shadow-2xl border border-white/10 translate-x-[-10px] group-hover:translate-x-0">
                       {tab.label}
-                      <div className="absolute right-full top-1/2 -translate-y-1/2 border-8 border-transparent border-r-slate-900 dark:border-r-dark-border" />
+                      <div className="absolute right-full top-1/2 -translate-y-1/2 border-8 border-transparent border-r-slate-900" />
                     </div>
-                    {activeTab === tab.id && (
-                        <motion.div 
-                          layoutId="activeTab"
-                          className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-8 bg-white rounded-r-full lg:hidden" 
-                        />
-                    )}
                   </button>
                 ))}
              </nav>
 
-             <div className="p-6 border-t border-slate-100 dark:border-dark-border">
+             <div className="p-4 border-t border-white/5 flex flex-col items-center gap-4">
+                <button 
+                  onClick={toggleTheme}
+                  className="w-12 h-12 rounded-2xl flex items-center justify-center text-slate-500 hover:bg-white/5 hover:text-white transition-all"
+                >
+                  {theme === 'light' ? <Moon size={20} /> : <Sun size={20} />}
+                </button>
                 <button 
                   onClick={() => resetApp(false)}
-                  className="w-full flex items-center gap-3 px-4 py-3.5 rounded-2xl text-slate-500 hover:bg-red-50 hover:text-red-600 dark:hover:bg-red-900/10 transition-all font-medium"
+                  className="w-12 h-12 rounded-2xl flex items-center justify-center text-slate-500 hover:bg-red-500/10 hover:text-red-500 transition-all"
                 >
                   <LogOut size={22} />
-                  <span className="hidden lg:block text-[15px]">Logout</span>
                 </button>
              </div>
           </aside>
 
           {/* MAIN CONTENT AREA */}
-          <div className="flex-1 flex flex-col h-full overflow-hidden relative z-10">
+          <div className="flex-1 flex flex-col h-full overflow-hidden relative z-10 custom-scrollbar">
              
              {/* TOP HEADER */}
-             <header className="h-20 bg-white/80 dark:bg-dark-bg/80 backdrop-blur-xl border-b border-slate-200 dark:border-dark-border flex items-center justify-between px-8 z-40 transition-colors duration-300">
+             <header className="h-20 bg-transparent flex items-center justify-between px-8 z-40">
                 
                 {/* Mobile Menu Trigger */}
                 <button 
                   onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-                  className="md:hidden p-2 -ml-2 text-slate-900 dark:text-white"
+                  className="md:hidden p-2 -ml-2 text-white"
                 >
                    {isMobileMenuOpen ? <X /> : <Menu />}
                 </button>
 
-                {/* Search Bar */}
-                <div className="hidden md:flex items-center gap-3 bg-slate-50 dark:bg-dark-card px-5 py-2.5 rounded-2xl w-full max-w-md border border-slate-200 dark:border-dark-border focus-within:border-blue-500 transition-all shadow-sm">
-                   <Search size={18} className="text-slate-400" />
+                {/* Search Bar - Styled like the image */}
+                <div className="hidden md:flex items-center gap-3 bg-white/5 backdrop-blur-xl px-5 py-2.5 rounded-2xl w-full max-w-sm border border-white/5 focus-within:border-habithub-accent/30 transition-all">
+                   <Search size={18} className="text-slate-500" />
                    <input 
-                      placeholder="Search anything..." 
-                      className="bg-transparent border-none outline-none text-sm w-full placeholder:text-slate-500 text-slate-900 dark:text-white font-medium"
+                      placeholder="Search" 
+                      className="bg-transparent border-none outline-none text-sm w-full placeholder:text-slate-500 text-white font-medium"
                    />
                 </div>
 
                 {/* Right Actions */}
-                <div className="flex items-center gap-5">
-                   <button 
-                      onClick={toggleTheme}
-                      className="group relative w-11 h-11 rounded-2xl flex items-center justify-center text-slate-600 hover:bg-slate-100 dark:text-slate-400 dark:hover:bg-dark-cardHover transition-all border border-transparent hover:border-slate-200 dark:hover:border-dark-border"
-                   >
-                      {theme === 'light' ? <Moon size={20} /> : <Sun size={20} />}
-                      <div className="absolute top-full mt-3 px-3 py-2 bg-slate-900 dark:bg-dark-card text-white text-[10px] font-bold rounded-xl opacity-0 group-hover:opacity-100 pointer-events-none transition-all duration-200 whitespace-nowrap z-[100] shadow-2xl border border-slate-200 dark:border-dark-border translate-y-[-5px] group-hover:translate-y-0">
-                        {theme === 'light' ? 'Dark Mode' : 'Light Mode'}
-                        <div className="absolute bottom-full left-1/2 -translate-x-1/2 border-8 border-transparent border-b-slate-900 dark:border-b-dark-border" />
-                      </div>
-                   </button>
-                   
-                   <button className="group relative w-11 h-11 rounded-2xl flex items-center justify-center text-slate-600 hover:bg-slate-100 dark:text-slate-400 dark:hover:bg-dark-cardHover transition-all border border-transparent hover:border-slate-200 dark:hover:border-dark-border">
-                      <Bell size={20} />
-                      <span className="absolute top-3 right-3.5 w-2 h-2 bg-blue-500 rounded-full border-2 border-white dark:border-dark-card" />
-                      <div className="absolute top-full mt-3 px-3 py-2 bg-slate-900 dark:bg-dark-card text-white text-[10px] font-bold rounded-xl opacity-0 group-hover:opacity-100 pointer-events-none transition-all duration-200 whitespace-nowrap z-[100] shadow-2xl border border-slate-200 dark:border-dark-border translate-y-[-5px] group-hover:translate-y-0">
-                        Notifications
-                        <div className="absolute bottom-full left-1/2 -translate-x-1/2 border-8 border-transparent border-b-slate-900 dark:border-b-dark-border" />
-                      </div>
+                <div className="flex items-center gap-6">
+                   <button className="relative text-slate-400 hover:text-white transition-colors">
+                      <Bell size={22} />
+                      <span className="absolute -top-1 -right-1 w-2 h-2 bg-habithub-accent rounded-full border-2 border-habithub-bg" />
                    </button>
 
-                   <div className="hidden sm:flex items-center gap-4 pl-5 border-l border-slate-200 dark:border-dark-border">
-                      <div className="text-right">
-                         <div className="text-sm font-bold text-slate-900 dark:text-white leading-none">{user?.name}</div>
-                         <div className="text-[10px] font-bold text-blue-500 uppercase tracking-widest mt-1.5">Premium Member</div>
-                      </div>
-                      <div className="w-11 h-11 rounded-2xl bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center text-white font-bold text-sm shadow-glow">
-                         {user?.name.charAt(0)}
+                   <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 rounded-full border-2 border-habithub-accent/30 p-0.5 overflow-hidden">
+                        <img 
+                          src={user?.photoURL || `https://api.dicebear.com/7.x/avataaars/svg?seed=${user?.name}`}
+                          alt="Profile"
+                          className="w-full h-full rounded-full bg-habithub-sidebar object-cover"
+                          referrerPolicy="no-referrer"
+                        />
                       </div>
                    </div>
                 </div>
              </header>
 
              {/* SCROLLABLE PAGE CONTENT */}
-             <main className="flex-1 overflow-y-auto p-4 md:p-8 pb-24 md:pb-8 scroll-smooth">
-                <div className="max-w-7xl mx-auto animate-fade-in">
+             <main className="flex-1 overflow-y-auto custom-scrollbar">
+                <div className={`mx-auto animate-fade-in ${activeTab === 'dashboard' ? 'max-w-none px-0' : 'max-w-7xl p-4 md:p-8'}`}>
                   {activeTab === 'dashboard' && <Dashboard />}
                   {activeTab === 'growth' && <GrowthChatbot />}
                   {activeTab === 'optimize' && <OptimizeRoutineModal isPage={true} />}
