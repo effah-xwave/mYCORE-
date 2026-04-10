@@ -120,11 +120,11 @@ export default function GrowthChatbot() {
   };
 
   return (
-    <div className="flex flex-col h-[calc(100vh-12rem)] max-w-4xl mx-auto glass-card rounded-[2.5rem] overflow-hidden animate-fade-in border border-white/5">
+    <div className="flex flex-col h-[calc(100vh-12rem)] max-w-4xl mx-auto bg-white dark:bg-dark-card backdrop-blur-xl rounded-[2.5rem] shadow-apple border border-slate-200 dark:border-dark-border overflow-hidden animate-fade-in">
       {/* Header */}
-      <div className="p-6 border-b border-white/5 flex items-center justify-between bg-white/5 backdrop-blur-xl">
+      <div className="p-6 border-b border-slate-100 dark:border-dark-border flex items-center justify-between bg-slate-50/50 dark:bg-dark-bg/30">
         <div className="flex items-center gap-4">
-          <div className="w-12 h-12 rounded-2xl bg-white/5 flex items-center justify-center shadow-glow-blue overflow-hidden border border-white/10">
+          <div className="w-12 h-12 rounded-2xl bg-white dark:bg-dark-card flex items-center justify-center shadow-glow overflow-hidden border border-slate-200 dark:border-dark-border">
             <img 
               src="https://drive.google.com/thumbnail?id=1Cn2hUpBxHLJ_6QmG8JYxJ9mjAgpDJa5f&sz=w128" 
               alt="CORE AI" 
@@ -132,16 +132,16 @@ export default function GrowthChatbot() {
               referrerPolicy="no-referrer"
               onError={(e) => { e.currentTarget.style.display = 'none'; e.currentTarget.nextElementSibling?.classList.remove('hidden'); }}
             />
-            <span className="hidden text-xs font-bold text-habithub-accent">CORE</span>
+            <span className="hidden text-xs font-bold text-blue-500">CORE</span>
           </div>
           <div>
-            <h2 className="text-xl font-bold text-white tracking-tight">{coachName}</h2>
-            <p className="text-[10px] font-bold text-habithub-accent uppercase tracking-widest">Growth & Development</p>
+            <h2 className="text-xl font-bold text-slate-900 dark:text-white tracking-tight">{coachName}</h2>
+            <p className="text-[10px] font-bold text-blue-500 uppercase tracking-widest">Growth & Development</p>
           </div>
         </div>
         <button 
           onClick={clearChat}
-          className="p-3 text-slate-500 hover:text-red-500 hover:bg-red-500/10 rounded-2xl transition-all"
+          className="p-3 text-slate-400 hover:text-red-500 hover:bg-red-100 dark:hover:bg-red-900/10 rounded-2xl transition-all"
         >
           <Trash2 size={20} />
         </button>
@@ -154,12 +154,12 @@ export default function GrowthChatbot() {
       >
         {messages.length === 0 ? (
           <div className="h-full flex flex-col items-center justify-center text-center space-y-6 opacity-60">
-            <div className="w-20 h-20 rounded-[2rem] bg-white/5 flex items-center justify-center text-slate-500">
+            <div className="w-20 h-20 rounded-[2rem] bg-slate-100 dark:bg-white/5 flex items-center justify-center text-slate-400">
               <MessageSquare size={40} strokeWidth={1.5} />
             </div>
             <div className="space-y-2">
-              <h3 className="text-xl font-bold text-white">Start your growth journey</h3>
-              <p className="text-sm text-slate-400 max-w-xs">Ask me about habit formation, productivity, or any area you want to develop.</p>
+              <h3 className="text-xl font-bold text-slate-900 dark:text-white">Start your growth journey</h3>
+              <p className="text-sm text-slate-500 dark:text-slate-400 max-w-xs">Ask me about habit formation, productivity, or any area you want to develop.</p>
             </div>
           </div>
         ) : (
@@ -171,7 +171,7 @@ export default function GrowthChatbot() {
               className={`flex ${m.role === 'user' ? 'justify-end' : 'justify-start'}`}
             >
               <div className={`flex gap-3 max-w-[85%] ${m.role === 'user' ? 'flex-row-reverse' : 'flex-row'}`}>
-                <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 overflow-hidden ${m.role === 'user' ? 'bg-habithub-accent text-white shadow-glow-blue' : 'bg-white/5 border border-white/10'}`}>
+                <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 overflow-hidden ${m.role === 'user' ? 'bg-slate-900 dark:bg-blue-600 text-white' : 'bg-white dark:bg-dark-card border border-slate-200 dark:border-dark-border'}`}>
                   {m.role === 'user' ? <UserIcon size={18} /> : (
                     <>
                       <img 
@@ -181,11 +181,11 @@ export default function GrowthChatbot() {
                         referrerPolicy="no-referrer"
                         onError={(e) => { e.currentTarget.style.display = 'none'; e.currentTarget.nextElementSibling?.classList.remove('hidden'); }}
                       />
-                      <span className="hidden text-[10px] font-bold text-habithub-accent">CORE</span>
+                      <span className="hidden text-[10px] font-bold text-blue-500">CORE</span>
                     </>
                   )}
                 </div>
-                <div className={`p-4 rounded-3xl text-sm leading-relaxed ${m.role === 'user' ? 'bg-habithub-accent text-white rounded-tr-none shadow-glow-blue' : 'bg-white/5 text-slate-200 rounded-tl-none border border-white/5'}`}>
+                <div className={`p-4 rounded-3xl text-sm leading-relaxed ${m.role === 'user' ? 'bg-slate-900 dark:bg-blue-600 text-white rounded-tr-none' : 'bg-slate-50 dark:bg-white/5 text-slate-800 dark:text-slate-200 rounded-tl-none border border-slate-100 dark:border-white/5'}`}>
                   <div className="markdown-body prose dark:prose-invert prose-sm max-w-none">
                     <ReactMarkdown>
                       {m.text}
@@ -203,7 +203,7 @@ export default function GrowthChatbot() {
             className="flex justify-start"
           >
             <div className="flex gap-3">
-              <div className="w-10 h-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center shrink-0 overflow-hidden">
+              <div className="w-10 h-10 rounded-xl bg-white dark:bg-dark-card border border-slate-200 dark:border-dark-border flex items-center justify-center shrink-0 overflow-hidden">
                 <img 
                   src="https://drive.google.com/thumbnail?id=1Cn2hUpBxHLJ_6QmG8JYxJ9mjAgpDJa5f&sz=w128" 
                   alt="CORE" 
@@ -211,9 +211,9 @@ export default function GrowthChatbot() {
                   referrerPolicy="no-referrer"
                   onError={(e) => { e.currentTarget.style.display = 'none'; e.currentTarget.nextElementSibling?.classList.remove('hidden'); }}
                 />
-                <span className="hidden text-[10px] font-bold text-habithub-accent">CORE</span>
+                <span className="hidden text-[10px] font-bold text-blue-500">CORE</span>
               </div>
-              <div className="p-4 rounded-3xl bg-white/5 text-slate-400 rounded-tl-none border border-white/5 flex items-center gap-2">
+              <div className="p-4 rounded-3xl bg-slate-50 dark:bg-white/5 text-slate-400 rounded-tl-none border border-slate-100 dark:border-white/5 flex items-center gap-2">
                 <Loader2 size={16} className="animate-spin" />
                 <span className="text-xs font-bold uppercase tracking-widest">{coachName} is thinking...</span>
               </div>
@@ -223,7 +223,7 @@ export default function GrowthChatbot() {
       </div>
 
       {/* Input */}
-      <div className="p-6 border-t border-white/5 bg-white/5 backdrop-blur-xl">
+      <div className="p-6 border-t border-slate-100 dark:border-dark-border bg-slate-50/50 dark:bg-dark-bg/30">
         <div className="relative flex items-center gap-3">
           <input 
             type="text"
@@ -231,17 +231,17 @@ export default function GrowthChatbot() {
             onChange={(e) => setInput(e.target.value)}
             onKeyPress={(e) => e.key === 'Enter' && handleSend()}
             placeholder="Ask your growth coach..."
-            className="flex-1 bg-white/5 border border-white/10 rounded-2xl px-6 py-4 text-sm font-medium focus:outline-none focus:ring-4 focus:ring-habithub-accent/20 focus:border-habithub-accent/30 transition-all placeholder:text-slate-500 text-white"
+            className="flex-1 bg-white dark:bg-dark-card border border-slate-200 dark:border-dark-border rounded-2xl px-6 py-4 text-sm font-medium focus:outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500/30 transition-all placeholder:text-slate-400 text-slate-900 dark:text-white"
           />
           <button 
             onClick={handleSend}
             disabled={!input.trim() || isTyping}
-            className="w-14 h-14 bg-habithub-accent text-white rounded-2xl flex items-center justify-center shadow-glow-blue hover:scale-105 active:scale-95 transition-all disabled:opacity-50 disabled:scale-100"
+            className="w-14 h-14 bg-slate-900 dark:bg-blue-600 text-white rounded-2xl flex items-center justify-center shadow-lg hover:scale-105 active:scale-95 transition-all disabled:opacity-50 disabled:scale-100"
           >
             <Send size={20} />
           </button>
         </div>
-        <p className="text-[9px] font-bold text-slate-500 uppercase tracking-widest text-center mt-4">Powered by Gemini 3 Flash</p>
+        <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest text-center mt-4">Powered by Gemini 3 Flash</p>
       </div>
     </div>
   );

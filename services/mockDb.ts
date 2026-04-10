@@ -19,8 +19,6 @@ export const db = {
   
   updateCoachName: (newName: string) => FirebaseDBService.updateCoachName(newName),
   
-  updateUserProfile: (updates: Partial<User>) => FirebaseDBService.updateUserProfile(updates),
-  
   getHabits: () => FirebaseDBService.getHabits(),
   
   toggleHabitFavorite: (habitId: string) => FirebaseDBService.toggleHabitFavorite(habitId),

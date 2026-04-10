@@ -179,17 +179,6 @@ export const FirebaseDBService = {
     }
   },
 
-  async updateUserProfile(updates: Partial<User>): Promise<void> {
-    const userId = auth.currentUser?.uid;
-    if (!userId) return;
-    const path = `users/${userId}`;
-    try {
-      await updateDoc(doc(db, path), updates);
-    } catch (error) {
-      handleFirestoreError(error, OperationType.UPDATE, path);
-    }
-  },
-
   // --- HABITS ---
   async getHabits(): Promise<Habit[]> {
     const userId = auth.currentUser?.uid;

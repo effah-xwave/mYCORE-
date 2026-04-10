@@ -47,16 +47,6 @@
                 text: '#F5F5F5',     // Off-white text
                 muted: '#888888',    // Muted gray
                 accent: '#007AFF',   // Primary Blue
-              },
-              habithub: {
-                bg: '#020617',
-                sidebar: '#0f172a',
-                card: '#1e293b',
-                accent: '#3b82f6',
-                purple: '#a855f7',
-                pink: '#ec4899',
-                orange: '#f97316',
-                cyan: '#06b6d4',
               }
             },
             boxShadow: {
@@ -64,8 +54,6 @@
               'apple': '0 12px 40px -4px rgba(0, 0, 0, 0.08)',
               'glass': '0 8px 32px 0 rgba(31, 38, 135, 0.05)',
               'glow': '0 0 20px rgba(0, 122, 255, 0.15)',
-              'glow-blue': '0 0 30px rgba(59, 130, 246, 0.2)',
-              'glow-purple': '0 0 30px rgba(168, 85, 247, 0.2)',
               'glow-green': '0 0 20px rgba(52, 199, 89, 0.15)',
               'inner-light': 'inset 0 1px 2px 0 rgba(255, 255, 255, 0.05)',
               'dark-soft': '0 4px 20px -2px rgba(0, 0, 0, 0.8)',
@@ -75,7 +63,6 @@
               'fade-in-up': 'fadeInUp 0.6s ease-out forwards',
               'scale-in': 'scaleIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards',
               'blob': 'blob 10s infinite',
-              'pulse-slow': 'pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite',
             },
             keyframes: {
               fadeIn: {
@@ -113,16 +100,8 @@
       
       /* Dark Mode Global Overrides */
       .dark body {
-        background-color: #020617; /* Matches habithub.bg */
+        background-color: #050505; /* Matches dark.bg */
         color: #F5F5F5; /* Matches dark.text */
-      }
-
-      /* Atmosphere Gradients */
-      .atmosphere-bg {
-        background: 
-          radial-gradient(circle at 20% 20%, rgba(59, 130, 246, 0.05) 0%, transparent 40%),
-          radial-gradient(circle at 80% 80%, rgba(168, 85, 247, 0.05) 0%, transparent 40%),
-          radial-gradient(circle at 50% 50%, rgba(15, 23, 42, 1) 0%, #020617 100%);
       }
 
       /* Animation Delays */
@@ -142,21 +121,6 @@
         scrollbar-width: none;
       }
       
-      /* Custom scrollbar for dark mode */
-      .dark .custom-scrollbar::-webkit-scrollbar {
-        width: 6px;
-      }
-      .dark .custom-scrollbar::-webkit-scrollbar-track {
-        background: transparent;
-      }
-      .dark .custom-scrollbar::-webkit-scrollbar-thumb {
-        background: rgba(255, 255, 255, 0.1);
-        border-radius: 10px;
-      }
-      .dark .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-        background: rgba(255, 255, 255, 0.2);
-      }
-
       /* Glassmorphism utilities */
       .glass {
         background: rgba(203, 213, 225, 0.7); /* Grayscale glass */
@@ -167,21 +131,10 @@
         background: rgba(15, 23, 42, 0.6);
         border: 1px solid rgba(255, 255, 255, 0.05);
       }
-
-      .glass-card {
-        background: rgba(30, 41, 59, 0.4);
-        backdrop-filter: blur(12px);
-        border: 1px solid rgba(255, 255, 255, 0.05);
-      }
       
       /* Smooth tap highlight */
       * {
         -webkit-tap-highlight-color: transparent;
-      }
-
-      /* Chart Tooltip Customization */
-      .recharts-tooltip-wrapper {
-        outline: none !important;
       }
     </style>
   </head>
